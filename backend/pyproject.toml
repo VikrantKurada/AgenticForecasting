@@ -1,0 +1,12 @@
+[project]
+name = "agentic-forecasting-backend"
+version = "0.1.0"
+requires-python = ">=3.12"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+addopts = "-m \"not network\" -q"
+markers = [
+    "network: tests that hit real external APIs (excluded by default)",
+]
