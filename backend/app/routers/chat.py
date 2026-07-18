@@ -14,6 +14,7 @@ router = APIRouter(prefix="/api", tags=["chat"])
 
 class MessageIn(BaseModel):
     content: str
+    preferences: dict | None = None
 
 
 def _state(request: Request) -> dict:
@@ -35,6 +36,7 @@ def post_message(chat_id: str, body: MessageIn, request: Request):
         return handle_message(
             _state(request), chat_id, body.content,
             inline=getattr(request.app.state, "run_inline", False),
+            preferences=body.preferences,
         )
     except KeyError:
         raise HTTPException(status_code=404, detail="Chat not found")

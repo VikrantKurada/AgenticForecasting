@@ -85,6 +85,46 @@ def test_forecast_message_runs_workflow_and_persists_answer(client):
     assert messages[-1]["run_id"] == run_id
 
 
+def test_first_message_auto_names_chat(client):
+    test_client, factory, cid = client
+    assert test_client.get(f"/api/chats/{cid}").json()["title"] == "c"
+    # rename to the default so auto-naming applies
+    test_client.patch(f"/api/chats/{cid}", json={"title": "New chat"})
+    test_client.post(
+        f"/api/chats/{cid}/messages",
+        json={"content": "Nowcast US GDP growth for the current quarter please"},
+    )
+    title = test_client.get(f"/api/chats/{cid}").json()["title"]
+    assert title.startswith("Nowcast US GDP growth")
+    assert title != "New chat"
+
+
+def test_chat_rename_endpoint(client):
+    test_client, factory, cid = client
+    resp = test_client.patch(f"/api/chats/{cid}", json={"title": "Q3 GDP work"})
+    assert resp.status_code == 200
+    assert test_client.get(f"/api/chats/{cid}").json()["title"] == "Q3 GDP work"
+    assert test_client.patch("/api/chats/nope", json={"title": "x"}).status_code == 404
+
+
+def test_preferences_flow_into_run_question(client):
+    test_client, factory, cid = client
+    resp = test_client.post(
+        f"/api/chats/{cid}/messages",
+        json={
+            "content": "Nowcast US GDP growth",
+            "preferences": {"source": "worldbank", "horizon": 8},
+        },
+    )
+    run_id = resp.json()["run_id"]
+    question = test_client.get(f"/api/runs/{run_id}").json()["question"]
+    assert "worldbank" in question
+    assert "8" in question
+    # the chat message itself stays clean
+    messages = test_client.get(f"/api/chats/{cid}/messages").json()
+    assert messages[0]["content"] == "Nowcast US GDP growth"
+
+
 def test_followup_answers_from_run_context(client):
     test_client, factory, cid = client
     test_client.post(

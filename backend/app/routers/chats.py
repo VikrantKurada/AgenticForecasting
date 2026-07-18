@@ -44,6 +44,18 @@ def get_chat(chat_id: str, db=Depends(get_db)):
     return _chat_or_404(db, chat_id)
 
 
+@router.patch("/chats/{chat_id}", response_model=schemas.ChatOut)
+def rename_chat(chat_id: str, body: schemas.ChatCreate, db=Depends(get_db)):
+    chat = _chat_or_404(db, chat_id)
+    chat.title = body.title.strip() or chat.title
+    record_event(
+        db, actor="user", event_type="chat_renamed",
+        project_id=chat.project_id, payload={"chat_id": chat.id, "title": chat.title},
+    )
+    db.commit()
+    return chat
+
+
 @router.delete("/chats/{chat_id}", status_code=204)
 def delete_chat(chat_id: str, db=Depends(get_db)):
     chat = _chat_or_404(db, chat_id)

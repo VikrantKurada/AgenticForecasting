@@ -113,13 +113,40 @@ def _answer_followup(state, chat_id: str, content: str) -> str:
     return resp.text
 
 
-def handle_message(state, chat_id: str, content: str, *, inline: bool = False) -> dict:
+AUTO_NAME_DEFAULTS = ("New chat", "")
+
+
+def _preferences_suffix(preferences: dict | None) -> str:
+    if not preferences:
+        return ""
+    parts = []
+    if preferences.get("source"):
+        parts.append(f"prefer data source '{preferences['source']}'")
+    if preferences.get("horizon"):
+        parts.append(f"forecast horizon: {preferences['horizon']} periods")
+    if preferences.get("history_years"):
+        parts.append(f"use about {preferences['history_years']} years of history")
+    return f"\n\n[User preferences: {'; '.join(parts)}]" if parts else ""
+
+
+def handle_message(
+    state, chat_id: str, content: str, *, inline: bool = False,
+    preferences: dict | None = None,
+) -> dict:
     session_factory = state["session_factory"]
     with session_factory() as s:
         chat = s.get(models.Chat, chat_id)
         if chat is None:
             raise KeyError("Chat not found")
         project_id = chat.project_id
+        if chat.title in AUTO_NAME_DEFAULTS:
+            title = content.strip().splitlines()[0][:60]
+            chat.title = title + ("…" if len(content.strip()) > 60 else "")
+            record_event(
+                s, actor="system", event_type="chat_auto_named",
+                project_id=project_id, payload={"chat_id": chat_id, "title": chat.title},
+            )
+            s.commit()
 
     user_message = _persist_message(session_factory, chat_id, "user", content)
     with session_factory() as s:
@@ -133,8 +160,9 @@ def handle_message(state, chat_id: str, content: str, *, inline: bool = False) -
     intent = classify_intent(content, has_prior)
 
     if intent == "forecast_request":
+        question = content + _preferences_suffix(preferences)
         with session_factory() as s:
-            run = models.Run(chat_id=chat_id, project_id=project_id, question=content)
+            run = models.Run(chat_id=chat_id, project_id=project_id, question=question)
             s.add(run)
             s.commit()
             run_id = run.id
