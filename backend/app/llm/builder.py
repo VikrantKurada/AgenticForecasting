@@ -74,7 +74,10 @@ def build_registry(session_factory) -> LLMRegistry:
         except Exception:
             continue
         chain.append((name, cfg["models"][name] if name != "fake" else "fake-1"))
-    if not chain:
-        adapters["fake"] = FakeLLM()
-        chain = [("fake", "fake-1")]
+    # Deterministic last resort so the app always produces a (clearly labeled)
+    # demo forecast even when no provider is reachable.
+    from app.llm.demo import DemoLLM
+
+    adapters["demo"] = DemoLLM()
+    chain.append(("demo", "demo-1"))
     return LLMRegistry(session_factory, adapters=adapters, chain=chain)
