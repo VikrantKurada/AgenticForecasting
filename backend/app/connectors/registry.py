@@ -1,12 +1,17 @@
+from app.connectors.alphavantage import AlphaVantageConnector
 from app.connectors.bls import BLSConnector
 from app.connectors.cache import CachedConnector
 from app.connectors.catalog import SOURCES
+from app.connectors.dbnomics import DBnomicsConnector
 from app.connectors.ecb import ECBConnector
+from app.connectors.eia import EIAConnector
+from app.connectors.faostat import FAOSTATConnector
 from app.connectors.fred import FredConnector
 from app.connectors.imf import IMFConnector
 from app.connectors.keys import get_datasource_key
 from app.connectors.oecd import OECDConnector
 from app.connectors.stubs import StubConnector
+from app.connectors.treasury import TreasuryConnector
 from app.connectors.worldbank import WorldBankConnector
 
 
@@ -19,6 +24,11 @@ def _implemented_connectors(session_factory) -> dict:
         "bls": BLSConnector(api_key=key("bls")),
         "ecb": ECBConnector(),
         "oecd": OECDConnector(),
+        "dbnomics": DBnomicsConnector(),
+        "treasury": TreasuryConnector(),
+        "eia": EIAConnector(api_key=key("eia")),
+        "faostat": FAOSTATConnector(),
+        "alphavantage": AlphaVantageConnector(api_key=key("alphavantage")),
     }
 
 
