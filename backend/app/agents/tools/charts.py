@@ -165,7 +165,9 @@ def _distribution_chart(args, ctx) -> dict:
     from app.forecasting.series import to_series
 
     series = to_series(ctx.data_store[args["series_key"]].observations)
-    use_pct = bool(args.get("pct", True)) and (series.abs() > 1e-9).all()
+    # Percent changes only make sense for strictly positive level series;
+    # rates that cross zero get absolute changes instead.
+    use_pct = bool(args.get("pct", True)) and (series > 0).all()
     changes = (series.pct_change() * 100 if use_pct else series.diff()).dropna()
     values = [float(v) for v in changes]
     mean, sigma = float(np.mean(values)), float(np.std(values))

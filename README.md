@@ -12,14 +12,27 @@ decision is traceable, and every token is accounted for.
 - **Dynamic agent workflows:** a planner LLM composes a run-specific DAG from specialist
   roles (data scout, fetcher, modeler, validator, chart builder, explainer); an executor
   streams every step live to the UI.
-- **Real data:** FRED, World Bank, IMF, BLS, ECB, OECD connectors (BEA & Census registered
-  as planned stubs), with retries and a 24 h SQLite cache.
-- **Econometrics:** auto-order ARIMA/SARIMAX, ETS, VAR, bridge/dynamic-factor nowcasting,
-  Nelson-Siegel yield curves, gradient-boosted credit risk — always backtested against a
-  naive baseline so the explanation is honest.
-- **Charts:** fan charts with confidence bands, indicator panels, backtest comparisons,
-  yield curves, and data tables in a Fragments-style output panel (Charts / Data / Report /
-  Trace tabs), exportable to your Desktop.
+- **Real data:** working connectors for FRED, World Bank, IMF, BLS, ECB, OECD, DBnomics
+  (80+ providers incl. BoE, Bundesbank, Eurostat), US Treasury Fiscal Data, EIA (world
+  energy production/consumption), FAOSTAT (global agricultural commodities), and Alpha
+  Vantage (equities/FX/crypto) — with retries and a 24 h SQLite cache. A 40+ source
+  catalog (Polygon, Finnhub, FMP, Tiingo, Alpaca, Companies House, …) accepts API keys
+  in Settings → Data sources now and activates as connectors ship.
+- **Econometrics & ML:** auto-order ARIMA/SARIMAX, ETS, Theta, VAR, bridge/dynamic-factor
+  nowcasting, gradient boosting on lag features, Monte Carlo bootstrap fans, model
+  ensembles, Nelson-Siegel yield curves, gradient-boosted credit risk — always backtested
+  against a naive baseline so the explanation is honest.
+- **Charts:** fan charts with confidence bands, model-comparison overlays, trend/seasonal
+  decompositions, change distributions, correlation heatmaps, indicator panels, backtest
+  comparisons, yield curves, and data tables in a resizable Fragments-style output panel
+  (Charts / Data / Report / Methodology / Trace tabs).
+- **Per-run methodology:** a dedicated Methodology tab documents the workflow DAG, data
+  provenance, every model's parameters and fit statistics, how uncertainty bands were
+  derived, and the backtest verdict — generated from what the run actually did.
+- **Chats & exports:** chats auto-name from the first question and can be renamed; per-run
+  data source and horizon preferences; one-click export of a chat or a whole project
+  (transcript, reports, methodology, charts as HTML, data as CSV, trace JSON) into a
+  folder on your Desktop.
 - **Memory (5 types):** short-term chat context, episodic run history, semantic facts with
   retrieval, procedural workflow templates, all persisted long-term in SQLite — pluggable
   backends with Mem0 and Zep adapters plus connect stubs for Letta, Supermemory, Cognee,
@@ -47,7 +60,11 @@ cd frontend
 npm install
 ```
 
-### Keys (`backend/.env`, all optional)
+### Keys (all optional)
+
+Data-source API keys can be entered directly in **Settings → Data sources** (stored in
+the local SQLite DB, masked in the UI). `backend/.env` still works as a fallback for the
+keys below and for LLM providers:
 
 | Key | Enables |
 | --- | --- |

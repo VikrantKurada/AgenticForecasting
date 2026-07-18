@@ -30,6 +30,7 @@ export default function OutputPanel({
   const [width, setWidth] = useState(() =>
     clampWidth(Number(localStorage.getItem('outputPanelWidth')) || DEFAULT_WIDTH),
   )
+  const widthRef = useRef(width)
   const dragging = useRef(false)
 
   useEffect(() => {
@@ -53,18 +54,17 @@ export default function OutputPanel({
 
   const onDragMove = useCallback((event: React.PointerEvent) => {
     if (!dragging.current) return
-    setWidth(clampWidth(window.innerWidth - event.clientX))
+    const next = clampWidth(window.innerWidth - event.clientX)
+    widthRef.current = next
+    setWidth(next)
   }, [])
 
-  const onDragEnd = useCallback(
-    (event: React.PointerEvent) => {
-      if (!dragging.current) return
-      dragging.current = false
-      ;(event.target as HTMLElement).releasePointerCapture(event.pointerId)
-      localStorage.setItem('outputPanelWidth', String(width))
-    },
-    [width],
-  )
+  const onDragEnd = useCallback((event: React.PointerEvent) => {
+    if (!dragging.current) return
+    dragging.current = false
+    ;(event.target as HTMLElement).releasePointerCapture(event.pointerId)
+    localStorage.setItem('outputPanelWidth', String(widthRef.current))
+  }, [])
 
   const counts = {
     charts: artifacts.filter((a) => a.kind === 'chart').length,

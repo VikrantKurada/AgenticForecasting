@@ -60,6 +60,24 @@ def test_distribution_chart_is_histogram_with_stats(ctx):
     assert "mean" in str(figure["layout"]).lower()
 
 
+def test_distribution_uses_absolute_changes_for_zero_crossing_series(ctx):
+    from app.connectors.base import SeriesData, SeriesMeta
+
+    belt, context = ctx
+    observations = [(f"20{10 + i:02d}", float((-1) ** i * (i + 0.5))) for i in range(20)]
+    context.data_store["fake:RATE"] = SeriesData(
+        meta=SeriesMeta(source="fake", series_id="RATE", title="A rate"),
+        observations=observations,
+    )
+    execute_tool(
+        belt, "build_chart",
+        {"kind": "distribution", "title": "Rate changes", "series_key": "fake:RATE"},
+        context,
+    )
+    figure = last_chart(context)
+    assert figure["data"][0]["name"] == "change"  # absolute, not "% change"
+
+
 def test_correlation_heatmap_across_series(ctx):
     belt, context = ctx
     execute_tool(
