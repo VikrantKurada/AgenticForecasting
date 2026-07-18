@@ -50,3 +50,5 @@ def test_demo_llm_completes_a_full_run_with_artifacts(env):
         kinds = {a.kind for a in artifacts}
         assert "chart" in kinds
         assert "report" in kinds
+        charts = [a for a in artifacts if a.kind == "chart"]
+        assert len(charts) >= 4  # fan, model_compare, backtest, decomposition, distribution

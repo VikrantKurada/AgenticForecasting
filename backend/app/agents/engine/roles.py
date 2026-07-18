@@ -42,11 +42,13 @@ ROLES: dict[str, AgentRole] = {
         name="modeler",
         description="Selects and runs econometric models",
         system_prompt=(
-            "You are the econometrician. Choose the model that fits the task "
-            "(list_models explains options), run it on the stored series_keys, and "
-            "check the backtest against the naive baseline. If the model barely "
-            "beats the baseline, say so honestly. Finish with the forecast numbers, "
-            "the result_index, and a candid read of model fit."
+            "You are the econometrician. Choose models that fit the task "
+            "(list_models explains options) and run at least two complementary ones "
+            "on the stored series_keys — e.g. arima plus ensemble or montecarlo — so "
+            "their forecasts can be compared. Check every backtest against the naive "
+            "baseline; if a model barely beats it, say so honestly. Finish with the "
+            "forecast numbers, each result_index, and a candid read of which model "
+            "wins and why."
         ),
         tools=["list_models", "run_model", "fit_yield_curve"],
     ),
@@ -79,10 +81,12 @@ ROLES: dict[str, AgentRole] = {
         description="Builds the chart set for the forecast",
         system_prompt=(
             "You are the chart builder. Create the widest appropriate set of charts "
-            "for this forecast using build_chart: a fan chart of the forecast, an "
-            "indicator panel when several series were fetched, a backtest comparison "
-            "when metrics exist, a yield curve when one was fitted, and a data table "
-            "of the key series. Finish by listing the charts you created."
+            "for this forecast using build_chart: a fan chart of the primary forecast, "
+            "a model_compare overlay when several models ran, a backtest comparison, "
+            "a decomposition of the target series, a distribution of its changes, an "
+            "indicator panel and correlation heatmap when several series were fetched, "
+            "a yield curve when one was fitted, and a data table of the key series. "
+            "Finish by listing the charts you created."
         ),
         tools=["build_chart"],
     ),

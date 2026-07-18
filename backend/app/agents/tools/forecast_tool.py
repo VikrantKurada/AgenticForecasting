@@ -23,7 +23,7 @@ def run_model_tool(args, ctx):
     horizon = int(args.get("horizon", 4))
     kwargs = {"horizon": horizon}
 
-    if model in ("arima", "ets"):
+    if model in ("arima", "ets", "theta", "gbm", "montecarlo", "ensemble"):
         kwargs["series"] = _series_for(ctx, args["series_key"])
     elif model == "var":
         frames = {key: _series_for(ctx, key) for key in args["series_keys"]}

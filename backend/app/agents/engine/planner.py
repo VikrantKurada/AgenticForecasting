@@ -94,11 +94,15 @@ def _template(kind: str, question: str) -> dict:
         {"id": "fetch", "role": "data_fetcher", "depends_on": ["scout"],
          "instructions": "Fetch every series the scout recommended. Report stored series_keys."},
         {"id": "model", "role": "modeler", "depends_on": ["fetch"],
-         "instructions": f"Use {model_note}. Report forecasts with result_index values."},
+         "instructions": f"Use {model_note}. Also run a second complementary model "
+                         "(ensemble or montecarlo) for comparison. Report forecasts "
+                         "with result_index values."},
         {"id": "validate", "role": "validator", "depends_on": ["model"],
-         "instructions": "Assess the model choice and backtest. Flag weak spots."},
+         "instructions": "Assess the model choices and backtests. Flag weak spots."},
         {"id": "charts", "role": "chart_builder", "depends_on": ["model"],
-         "instructions": "Build the full chart set: fan chart, indicator panel, backtest, and a data table."},
+         "instructions": "Build the full chart set: fan chart, model comparison, "
+                         "backtest, decomposition, distribution of changes, indicator "
+                         "panel/heatmap if several series exist, and a data table."},
         {"id": "explain", "role": "explainer", "depends_on": ["validate", "charts"],
          "instructions": f"Write the final report answering: {question}"},
     ]

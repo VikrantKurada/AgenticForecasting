@@ -67,7 +67,12 @@ class DemoLLM:
         if "econometrician" in system:
             if step == 0:
                 return _tool("run_model", {"model": "arima", "series_key": SERIES_KEY, "horizon": 4})
-            return _finish("ARIMA forecast produced at result_index 0 with backtest metrics.")
+            if step == 1:
+                return _tool("run_model", {"model": "montecarlo", "series_key": SERIES_KEY, "horizon": 4})
+            return _finish(
+                "ARIMA (result_index 0) and Monte Carlo bootstrap (result_index 1) "
+                "forecasts produced with backtest metrics."
+            )
         if "validator" in system:
             return _finish(
                 "Demo-mode check: ARIMA order chosen by AIC; see the backtest chart for "
@@ -77,14 +82,23 @@ class DemoLLM:
             charts = [
                 _tool("build_chart", {"kind": "fan", "title": "Forecast with confidence bands",
                                       "series_key": SERIES_KEY, "result_index": 0}),
+                _tool("build_chart", {"kind": "model_compare", "title": "ARIMA vs Monte Carlo",
+                                      "series_key": SERIES_KEY, "result_indices": [0, 1]}),
                 _tool("build_chart", {"kind": "backtest", "title": "Backtest vs naive baseline",
                                       "result_index": 0}),
+                _tool("build_chart", {"kind": "decomposition", "title": "Trend decomposition",
+                                      "series_key": SERIES_KEY}),
+                _tool("build_chart", {"kind": "distribution", "title": "Distribution of changes",
+                                      "series_key": SERIES_KEY}),
                 _tool("build_chart", {"kind": "table", "title": "Underlying data",
                                       "series_key": SERIES_KEY}),
             ]
             if step < len(charts):
                 return charts[step]
-            return _finish("Created fan chart, backtest comparison, and data table.")
+            return _finish(
+                "Created fan chart, model comparison, backtest, decomposition, "
+                "distribution, and data table."
+            )
         if "explainer" in system:
             return _finish(REPORT)
         return _finish("Demo mode: done.")
