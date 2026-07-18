@@ -1,4 +1,4 @@
-"""FAO FAOSTAT (no key): global agricultural commodity production, area, trade.
+﻿"""FAO FAOSTAT (no key): global agricultural commodity production, area, trade.
 
 Series IDs: "DOMAIN/AREA/ELEMENT/ITEM", e.g. "QCL/5000/5510/15" =
 crops & livestock / World / Production (t) / Wheat.
@@ -9,15 +9,15 @@ from app.connectors.base import ConnectorError, SeriesData, SeriesMeta, request_
 
 BASE = "https://faostatservices.fao.org/api/v1/en"
 
-# (series_id, title) — domain QCL, area 5000 = World, element 5510 = production (t)
+# (series_id, title) - domain QCL, area 5000 = World, element 5510 = production (t)
 CATALOG = [
-    ("QCL/5000/5510/15", "World wheat production (tonnes, annual)"),
-    ("QCL/5000/5510/56", "World maize production (tonnes, annual)"),
-    ("QCL/5000/5510/27", "World rice production (tonnes, annual)"),
-    ("QCL/5000/5510/236", "World soybean production (tonnes, annual)"),
-    ("QCL/5000/5510/156", "World sugar cane production (tonnes, annual)"),
-    ("QCL/5000/5510/656", "World green coffee production (tonnes, annual)"),
-    ("QCL/5000/5312/15", "World wheat area harvested (ha, annual)"),
+    ("QCL/5000/5510/15", "World Wheat production (tonnes, annual)"),
+    ("QCL/5000/5510/56", "World Maize production (tonnes, annual)"),
+    ("QCL/5000/5510/27", "World Rice production (tonnes, annual)"),
+    ("QCL/5000/5510/236", "World Soybean production (tonnes, annual)"),
+    ("QCL/5000/5510/156", "World Sugar Cane production (tonnes, annual)"),
+    ("QCL/5000/5510/656", "World Green Coffee production (tonnes, annual)"),
+    ("QCL/5000/5312/15", "World Wheat area harvested (ha, annual)"),
     ("FBS/5000/664/2901", "World food supply per capita (kcal/day, annual)"),
 ]
 
