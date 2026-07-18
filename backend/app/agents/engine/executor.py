@@ -148,7 +148,17 @@ def execute_run(
                         dep_outputs[node_id] = output
                         sorter.done(node_id)
 
-        # Persist artifacts produced by the tools
+        summary = next(
+            (dep_outputs[n["id"]] for n in reversed(plan["nodes"]) if n["role"] == "explainer"),
+            dep_outputs.get(plan["nodes"][-1]["id"], ""),
+        )
+        if summary:
+            ctx.artifacts.append(
+                {"kind": "report", "title": f"Report — {question[:60]}",
+                 "payload": {"markdown": summary}}
+            )
+
+        # Persist artifacts produced by the tools plus the final report
         with session_factory() as s:
             for artifact in ctx.artifacts:
                 s.add(
@@ -162,11 +172,6 @@ def execute_run(
             run.status = "completed"
             run.finished_at = models.utcnow()
             s.commit()
-
-        summary = next(
-            (dep_outputs[n["id"]] for n in reversed(plan["nodes"]) if n["role"] == "explainer"),
-            dep_outputs.get(plan["nodes"][-1]["id"], ""),
-        )
         metrics = {}
         for result in ctx.results:
             backtest = getattr(result, "backtest", None)

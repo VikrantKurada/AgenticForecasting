@@ -1,6 +1,12 @@
+import { useEffect, useState } from 'react'
+import { api } from '../../api/client'
+import type { Artifact, Run, TraceSpan } from '../../types'
 import { XIcon } from '../icons'
+import SaveDialog from './SaveDialog'
+import { ChartsTab, DataTab, ReportTab, TraceTab } from './tabs'
 
-// Placeholder — the Fragments-style tabbed panel lands in the next build step.
+type Tab = 'charts' | 'data' | 'report' | 'trace'
+
 export default function OutputPanel({
   runId,
   onClose,
@@ -8,17 +14,86 @@ export default function OutputPanel({
   runId: string
   onClose: () => void
 }) {
+  const [run, setRun] = useState<Run | null>(null)
+  const [artifacts, setArtifacts] = useState<Artifact[]>([])
+  const [spans, setSpans] = useState<TraceSpan[]>([])
+  const [tab, setTab] = useState<Tab>('charts')
+  const [saveTarget, setSaveTarget] = useState<Artifact | null>(null)
+
+  useEffect(() => {
+    api.getRun(runId).then(setRun).catch(() => undefined)
+    api
+      .getRunArtifacts(runId)
+      .then((items) => {
+        setArtifacts(items)
+        if (!items.some((a) => a.kind === 'chart')) {
+          setTab(items.some((a) => a.kind === 'report') ? 'report' : 'trace')
+        }
+      })
+      .catch(() => undefined)
+    api.getRunTrace(runId).then((t) => setSpans(t.spans)).catch(() => undefined)
+  }, [runId])
+
+  const counts = {
+    charts: artifacts.filter((a) => a.kind === 'chart').length,
+    data: artifacts.filter((a) => a.kind === 'table').length,
+    report: artifacts.filter((a) => a.kind === 'report').length,
+    trace: spans.length,
+  }
+
+  const tabs: { key: Tab; label: string; count: number }[] = [
+    { key: 'charts', label: 'Charts', count: counts.charts },
+    { key: 'data', label: 'Data', count: counts.data },
+    { key: 'report', label: 'Report', count: counts.report },
+    { key: 'trace', label: 'Trace', count: counts.trace },
+  ]
+
   return (
-    <aside className="flex w-[420px] shrink-0 flex-col border-l border-slate-200 dark:border-slate-800">
-      <div className="flex items-center justify-between border-b border-slate-200 px-4 py-2.5 dark:border-slate-800">
-        <span className="text-sm font-medium">Output</span>
+    <aside className="flex w-[460px] shrink-0 flex-col border-l border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950">
+      <div className="flex items-center justify-between gap-2 border-b border-slate-200 px-3 py-2 dark:border-slate-800">
+        <div className="min-w-0">
+          <p className="truncate text-xs font-medium text-slate-700 dark:text-slate-200">
+            {run?.question ?? 'Run output'}
+          </p>
+          <p className="text-[10px] text-slate-400">
+            {run ? `${run.status}${run.plan ? ` · ${run.plan.kind.replace('_', ' ')}` : ''}` : ''}
+          </p>
+        </div>
         <button onClick={onClose} className="rounded p-1 text-slate-400 hover:text-slate-600">
           <XIcon />
         </button>
       </div>
-      <div className="flex flex-1 items-center justify-center text-xs text-slate-400">
-        Artifacts for run {runId.slice(0, 8)}…
+
+      <div className="flex border-b border-slate-200 text-xs dark:border-slate-800">
+        {tabs.map(({ key, label, count }) => (
+          <button
+            key={key}
+            onClick={() => setTab(key)}
+            className={`flex-1 border-b-2 px-2 py-2 font-medium transition-colors ${
+              tab === key
+                ? 'border-slate-900 text-slate-900 dark:border-slate-100 dark:text-slate-100'
+                : 'border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+            }`}
+          >
+            {label}
+            {count > 0 && <span className="ml-1 text-[10px] text-slate-400">{count}</span>}
+          </button>
+        ))}
       </div>
+
+      <div className="min-h-0 flex-1 overflow-y-auto">
+        {run?.status === 'failed' && (
+          <p className="m-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-300">
+            Run failed: {run.error}
+          </p>
+        )}
+        {tab === 'charts' && <ChartsTab artifacts={artifacts} onSave={setSaveTarget} />}
+        {tab === 'data' && <DataTab artifacts={artifacts} onSave={setSaveTarget} />}
+        {tab === 'report' && <ReportTab artifacts={artifacts} onSave={setSaveTarget} />}
+        {tab === 'trace' && <TraceTab spans={spans} />}
+      </div>
+
+      {saveTarget && <SaveDialog artifact={saveTarget} onClose={() => setSaveTarget(null)} />}
     </aside>
   )
 }

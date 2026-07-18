@@ -76,6 +76,8 @@ def test_forecast_message_runs_workflow_and_persists_answer(client):
 
     artifacts = test_client.get(f"/api/runs/{run_id}/artifacts").json()
     assert any(a["kind"] == "chart" for a in artifacts)
+    report = next(a for a in artifacts if a["kind"] == "report")
+    assert "Methodology" in report["payload"]["markdown"]
 
     messages = test_client.get(f"/api/chats/{cid}/messages").json()
     assert messages[-1]["role"] == "assistant"
