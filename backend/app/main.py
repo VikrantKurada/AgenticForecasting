@@ -12,6 +12,7 @@ from app.routers import (
     datasources,
     files,
     integrations,
+    mcp_settings,
     projects,
     providers,
     telemetry,
@@ -53,4 +54,5 @@ def create_app(
     app.include_router(chat.router)
     app.include_router(telemetry.router)
     app.include_router(files.router)
+    app.include_router(mcp_settings.router)
     return app
