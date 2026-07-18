@@ -6,7 +6,15 @@ from app.connectors.registry import build_connectors
 from app.db import init_db, make_engine, make_session_factory
 from app.llm.builder import build_registry
 from app.memory.integrations import build_memory_backend
-from app.routers import chat, chats, datasources, integrations, projects, providers
+from app.routers import (
+    chat,
+    chats,
+    datasources,
+    integrations,
+    projects,
+    providers,
+    telemetry,
+)
 
 
 def create_app(
@@ -42,4 +50,5 @@ def create_app(
     app.include_router(datasources.router)
     app.include_router(integrations.router)
     app.include_router(chat.router)
+    app.include_router(telemetry.router)
     return app
