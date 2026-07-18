@@ -50,10 +50,15 @@ export interface Plan {
 
 export interface Artifact {
   id: string
-  kind: 'chart' | 'table' | 'report' | 'file'
+  kind: 'chart' | 'table' | 'report' | 'methodology' | 'file'
   title: string
   payload: Record<string, unknown>
   created_at: string
+}
+
+export interface RunPreferences {
+  source?: string
+  horizon?: number
 }
 
 export interface RunEvent {
@@ -81,10 +86,16 @@ export interface ProviderInfo {
 export interface Datasource {
   name: string
   label: string
+  category: string
   available: boolean
   needs_key: boolean
   key_present: boolean
   note: string
+}
+
+export interface DatasourceKeyStatus {
+  present: boolean
+  masked: string
 }
 
 export interface Integration {

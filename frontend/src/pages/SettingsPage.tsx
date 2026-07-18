@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api } from '../api/client'
-import type { Datasource, Integration, ProviderInfo } from '../types'
+import type { Datasource, DatasourceKeyStatus, Integration, ProviderInfo } from '../types'
 
 type Tab = 'providers' | 'datasources' | 'memory' | 'mcp'
 
@@ -124,23 +124,92 @@ function ProvidersSection() {
 
 function DatasourcesSection() {
   const [sources, setSources] = useState<Datasource[]>([])
-  useEffect(() => {
+  const [keyStatus, setKeyStatus] = useState<Record<string, DatasourceKeyStatus>>({})
+  const [drafts, setDrafts] = useState<Record<string, string>>({})
+  const [status, setStatus] = useState('')
+
+  const refresh = () => {
     api.getDatasources().then(setSources)
-  }, [])
+    api.getDatasourceKeys().then(setKeyStatus)
+  }
+  useEffect(refresh, [])
+
+  const dirty = Object.keys(drafts).length > 0
+
+  const save = async () => {
+    setStatus('Saving…')
+    await api.putDatasourceKeys(drafts)
+    setDrafts({})
+    refresh()
+    setStatus('Saved. Connectors rebuilt with the new keys.')
+  }
+
+  const categories = [...new Set(sources.map((s) => s.category))]
+
   return (
-    <div className="space-y-2">
-      <p className="text-xs text-slate-400">
-        Economic data connectors. Keys go in <code>backend/.env</code> (FRED_API_KEY, BLS_API_KEY).
-      </p>
-      {sources.map((source) => (
-        <div
-          key={source.name}
-          className="flex flex-wrap items-center gap-2 rounded-lg border border-slate-200 px-3 py-2.5 dark:border-slate-800"
+    <div className="space-y-4">
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-xs text-slate-400">
+          Keys are stored locally (SQLite) and never leave this machine; <code>backend/.env</code>{' '}
+          still works as a fallback. Sources marked <em>planned</em> accept a key now and
+          activate when their connector ships.
+        </p>
+        <button
+          onClick={save}
+          disabled={!dirty}
+          className="shrink-0 rounded-md bg-slate-900 px-3 py-1.5 text-sm font-medium text-white disabled:opacity-40 dark:bg-slate-100 dark:text-slate-900"
         >
-          <span className="w-44 text-sm font-medium">{source.label}</span>
-          <Badge ok={source.available} yes="available" no="planned" />
-          {source.needs_key && <Badge ok={source.key_present} yes="key found" no="key missing" />}
-          <span className="text-xs text-slate-400">{source.note}</span>
+          Save keys
+        </button>
+      </div>
+      {status && <p className="text-xs text-slate-400">{status}</p>}
+      {categories.map((category) => (
+        <div key={category}>
+          <h3 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+            {category}
+          </h3>
+          <div className="space-y-1.5">
+            {sources
+              .filter((s) => s.category === category)
+              .map((source) => (
+                <div
+                  key={source.name}
+                  className="flex flex-wrap items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 dark:border-slate-800"
+                >
+                  <span className="w-52 truncate text-sm font-medium" title={source.note}>
+                    {source.label}
+                  </span>
+                  <Badge ok={source.available} yes="available" no="planned" />
+                  {source.needs_key ? (
+                    <>
+                      <Badge
+                        ok={keyStatus[source.name]?.present ?? source.key_present}
+                        yes="key saved"
+                        no="key needed"
+                      />
+                      <input
+                        type="password"
+                        value={drafts[source.name] ?? ''}
+                        onChange={(e) =>
+                          setDrafts({ ...drafts, [source.name]: e.target.value })
+                        }
+                        placeholder={
+                          keyStatus[source.name]?.present
+                            ? keyStatus[source.name].masked
+                            : 'paste API key'
+                        }
+                        className="w-44 rounded-md border border-slate-200 bg-white px-2 py-1 text-xs outline-none focus:border-slate-400 dark:border-slate-700 dark:bg-slate-950"
+                      />
+                    </>
+                  ) : (
+                    <Badge ok yes="no key needed" no="" />
+                  )}
+                  <span className="min-w-0 flex-1 truncate text-[11px] text-slate-400">
+                    {source.note}
+                  </span>
+                </div>
+              ))}
+          </div>
         </div>
       ))}
     </div>

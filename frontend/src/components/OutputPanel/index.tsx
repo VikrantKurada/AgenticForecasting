@@ -1,11 +1,19 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { api } from '../../api/client'
 import type { Artifact, Run, TraceSpan } from '../../types'
 import { XIcon } from '../icons'
 import SaveDialog from './SaveDialog'
-import { ChartsTab, DataTab, ReportTab, TraceTab } from './tabs'
+import { ChartsTab, DataTab, MethodologyTab, ReportTab, TraceTab } from './tabs'
 
-type Tab = 'charts' | 'data' | 'report' | 'trace'
+type Tab = 'charts' | 'data' | 'report' | 'methodology' | 'trace'
+
+const MIN_WIDTH = 340
+const DEFAULT_WIDTH = 460
+
+function clampWidth(width: number): number {
+  const max = Math.max(MIN_WIDTH, Math.floor(window.innerWidth * 0.72))
+  return Math.min(Math.max(width, MIN_WIDTH), max)
+}
 
 export default function OutputPanel({
   runId,
@@ -19,6 +27,10 @@ export default function OutputPanel({
   const [spans, setSpans] = useState<TraceSpan[]>([])
   const [tab, setTab] = useState<Tab>('charts')
   const [saveTarget, setSaveTarget] = useState<Artifact | null>(null)
+  const [width, setWidth] = useState(() =>
+    clampWidth(Number(localStorage.getItem('outputPanelWidth')) || DEFAULT_WIDTH),
+  )
+  const dragging = useRef(false)
 
   useEffect(() => {
     api.getRun(runId).then(setRun).catch(() => undefined)
@@ -34,10 +46,31 @@ export default function OutputPanel({
     api.getRunTrace(runId).then((t) => setSpans(t.spans)).catch(() => undefined)
   }, [runId])
 
+  const onDragStart = useCallback((event: React.PointerEvent) => {
+    dragging.current = true
+    ;(event.target as HTMLElement).setPointerCapture(event.pointerId)
+  }, [])
+
+  const onDragMove = useCallback((event: React.PointerEvent) => {
+    if (!dragging.current) return
+    setWidth(clampWidth(window.innerWidth - event.clientX))
+  }, [])
+
+  const onDragEnd = useCallback(
+    (event: React.PointerEvent) => {
+      if (!dragging.current) return
+      dragging.current = false
+      ;(event.target as HTMLElement).releasePointerCapture(event.pointerId)
+      localStorage.setItem('outputPanelWidth', String(width))
+    },
+    [width],
+  )
+
   const counts = {
     charts: artifacts.filter((a) => a.kind === 'chart').length,
     data: artifacts.filter((a) => a.kind === 'table').length,
     report: artifacts.filter((a) => a.kind === 'report').length,
+    methodology: artifacts.filter((a) => a.kind === 'methodology').length,
     trace: spans.length,
   }
 
@@ -45,11 +78,22 @@ export default function OutputPanel({
     { key: 'charts', label: 'Charts', count: counts.charts },
     { key: 'data', label: 'Data', count: counts.data },
     { key: 'report', label: 'Report', count: counts.report },
+    { key: 'methodology', label: 'Methodology', count: counts.methodology },
     { key: 'trace', label: 'Trace', count: counts.trace },
   ]
 
   return (
-    <aside className="flex w-[460px] shrink-0 flex-col border-l border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950">
+    <aside
+      style={{ width }}
+      className="relative flex shrink-0 flex-col border-l border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950"
+    >
+      <div
+        onPointerDown={onDragStart}
+        onPointerMove={onDragMove}
+        onPointerUp={onDragEnd}
+        title="Drag to resize"
+        className="absolute inset-y-0 -left-1 z-10 w-2 cursor-col-resize hover:bg-slate-300/50 dark:hover:bg-slate-600/50"
+      />
       <div className="flex items-center justify-between gap-2 border-b border-slate-200 px-3 py-2 dark:border-slate-800">
         <div className="min-w-0">
           <p className="truncate text-xs font-medium text-slate-700 dark:text-slate-200">
@@ -69,7 +113,7 @@ export default function OutputPanel({
           <button
             key={key}
             onClick={() => setTab(key)}
-            className={`flex-1 border-b-2 px-2 py-2 font-medium transition-colors ${
+            className={`flex-1 border-b-2 px-1.5 py-2 font-medium transition-colors ${
               tab === key
                 ? 'border-slate-900 text-slate-900 dark:border-slate-100 dark:text-slate-100'
                 : 'border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
@@ -90,6 +134,9 @@ export default function OutputPanel({
         {tab === 'charts' && <ChartsTab artifacts={artifacts} onSave={setSaveTarget} />}
         {tab === 'data' && <DataTab artifacts={artifacts} onSave={setSaveTarget} />}
         {tab === 'report' && <ReportTab artifacts={artifacts} onSave={setSaveTarget} />}
+        {tab === 'methodology' && (
+          <MethodologyTab artifacts={artifacts} onSave={setSaveTarget} />
+        )}
         {tab === 'trace' && <TraceTab spans={spans} />}
       </div>
 

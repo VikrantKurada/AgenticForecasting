@@ -2,12 +2,14 @@ import type {
   Artifact,
   Chat,
   Datasource,
+  DatasourceKeyStatus,
   Integration,
   Message,
   PostMessageResponse,
   Project,
   ProviderInfo,
   Run,
+  RunPreferences,
   TraceSpan,
   UsageSummary,
 } from '../types'
@@ -39,12 +41,24 @@ export const api = {
     request<Chat>(`/api/projects/${projectId}/chats`, { method: 'POST', body: JSON.stringify({ title }) }),
   deleteChat: (id: string) => request<void>(`/api/chats/${id}`, { method: 'DELETE' }),
   getChat: (id: string) => request<Chat>(`/api/chats/${id}`),
+  renameChat: (id: string, title: string) =>
+    request<Chat>(`/api/chats/${id}`, { method: 'PATCH', body: JSON.stringify({ title }) }),
   getMessages: (chatId: string) => request<Message[]>(`/api/chats/${chatId}/messages`),
-  postMessage: (chatId: string, content: string) =>
+  postMessage: (chatId: string, content: string, preferences?: RunPreferences) =>
     request<PostMessageResponse>(`/api/chats/${chatId}/messages`, {
       method: 'POST',
-      body: JSON.stringify({ content }),
+      body: JSON.stringify({ content, preferences }),
     }),
+  exportChat: (chatId: string, directory: string) =>
+    request<{ status: string; path: string; files: number }>(`/api/chats/${chatId}/export`, {
+      method: 'POST',
+      body: JSON.stringify({ directory }),
+    }),
+  exportProject: (projectId: string, directory: string) =>
+    request<{ status: string; path: string; files: number }>(
+      `/api/projects/${projectId}/export`,
+      { method: 'POST', body: JSON.stringify({ directory }) },
+    ),
 
   // runs
   getRun: (id: string) => request<Run>(`/api/runs/${id}`),
@@ -64,6 +78,13 @@ export const api = {
       { method: 'POST', body: JSON.stringify({ provider }) },
     ),
   getDatasources: () => request<Datasource[]>('/api/datasources'),
+  getDatasourceKeys: () =>
+    request<Record<string, DatasourceKeyStatus>>('/api/settings/datasource-keys'),
+  putDatasourceKeys: (keys: Record<string, string>) =>
+    request<{ status: string }>('/api/settings/datasource-keys', {
+      method: 'PUT',
+      body: JSON.stringify({ keys }),
+    }),
   getIntegrations: () =>
     request<{ active: string; configs: Record<string, unknown>; integrations: Integration[] }>(
       '/api/settings/integrations',

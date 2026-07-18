@@ -115,26 +115,43 @@ export function DataTab({
   )
 }
 
-export function ReportTab({
+function MarkdownArtifacts({
   artifacts,
+  kind,
+  emptyText,
   onSave,
 }: {
   artifacts: Artifact[]
+  kind: Artifact['kind']
+  emptyText: string
   onSave: (a: Artifact) => void
 }) {
-  const reports = artifacts.filter((a) => a.kind === 'report')
-  if (reports.length === 0)
-    return <p className="p-4 text-xs text-slate-400">No report for this run.</p>
+  const docs = artifacts.filter((a) => a.kind === kind)
+  if (docs.length === 0) return <p className="p-4 text-xs text-slate-400">{emptyText}</p>
   return (
     <div className="space-y-3 p-3">
-      {reports.map((report) => (
-        <ArtifactCard key={report.id} artifact={report} onSave={onSave}>
-          <div className="prose prose-sm prose-slate max-h-[60vh] max-w-none overflow-y-auto px-1 dark:prose-invert [&_h1]:text-base [&_h2]:text-sm [&_h3]:text-[13px]">
-            <Markdown>{String(report.payload.markdown ?? '')}</Markdown>
+      {docs.map((doc) => (
+        <ArtifactCard key={doc.id} artifact={doc} onSave={onSave}>
+          <div className="prose prose-sm prose-slate max-h-[70vh] max-w-none overflow-y-auto px-1 dark:prose-invert [&_h1]:text-base [&_h2]:text-sm [&_h3]:text-[13px] [&_table]:text-xs">
+            <Markdown>{String(doc.payload.markdown ?? '')}</Markdown>
           </div>
         </ArtifactCard>
       ))}
     </div>
+  )
+}
+
+export function ReportTab(props: { artifacts: Artifact[]; onSave: (a: Artifact) => void }) {
+  return <MarkdownArtifacts {...props} kind="report" emptyText="No report for this run." />
+}
+
+export function MethodologyTab(props: { artifacts: Artifact[]; onSave: (a: Artifact) => void }) {
+  return (
+    <MarkdownArtifacts
+      {...props}
+      kind="methodology"
+      emptyText="No methodology write-up for this run."
+    />
   )
 }
 

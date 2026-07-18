@@ -1,7 +1,17 @@
 import { useEffect, useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
+import { api } from '../api/client'
 import { useAppStore } from '../store/useAppStore'
-import { ChartIcon, ChevronIcon, GearIcon, PanelLeftIcon, PlusIcon, TrashIcon } from './icons'
+import ExportDialog from './ExportDialog'
+import {
+  ChartIcon,
+  ChevronIcon,
+  DownloadIcon,
+  GearIcon,
+  PanelLeftIcon,
+  PlusIcon,
+  TrashIcon,
+} from './icons'
 
 export default function Sidebar() {
   const {
@@ -14,6 +24,7 @@ export default function Sidebar() {
   const [expanded, setExpanded] = useState<Record<string, boolean>>({})
   const [creating, setCreating] = useState(false)
   const [newName, setNewName] = useState('')
+  const [exportTarget, setExportTarget] = useState<{ id: string; name: string } | null>(null)
 
   useEffect(() => {
     loadProjects()
@@ -157,6 +168,13 @@ export default function Sidebar() {
                 <PlusIcon className="h-3 w-3" />
               </button>
               <button
+                onClick={() => setExportTarget({ id: project.id, name: project.name })}
+                title="Export project to folder"
+                className="hidden rounded p-1 text-slate-400 hover:text-slate-700 group-hover:block dark:hover:text-slate-200"
+              >
+                <DownloadIcon className="h-3 w-3" />
+              </button>
+              <button
                 onClick={() => onDeleteProject(project.id, project.name)}
                 title="Delete project"
                 className="hidden rounded p-1 text-slate-400 hover:text-red-500 group-hover:block"
@@ -219,6 +237,13 @@ export default function Sidebar() {
           <GearIcon /> Settings
         </NavLink>
       </div>
+      {exportTarget && (
+        <ExportDialog
+          title={`Export project "${exportTarget.name}"`}
+          onExport={(directory) => api.exportProject(exportTarget.id, directory)}
+          onClose={() => setExportTarget(null)}
+        />
+      )}
     </aside>
   )
 }
