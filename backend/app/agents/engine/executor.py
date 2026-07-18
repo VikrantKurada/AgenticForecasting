@@ -157,6 +157,12 @@ def execute_run(
                 {"kind": "report", "title": f"Report — {question[:60]}",
                  "payload": {"markdown": summary}}
             )
+        from app.agents.engine.methodology import build_methodology
+
+        ctx.artifacts.append(
+            {"kind": "methodology", "title": "Prediction methodology",
+             "payload": {"markdown": build_methodology(question, plan, ctx, dep_outputs)}}
+        )
 
         # Persist artifacts produced by the tools plus the final report
         with session_factory() as s:

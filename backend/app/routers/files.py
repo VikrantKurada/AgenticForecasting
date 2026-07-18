@@ -49,7 +49,7 @@ def save_artifact(artifact_id: str, body: SaveRequest, db=Depends(get_db)):
     payload = json.loads(artifact.payload_json)
     stem = _safe_name(body.filename or artifact.title)
 
-    if artifact.kind == "report":
+    if artifact.kind in ("report", "methodology"):
         path = directory / f"{stem}.md"
         content = payload.get("markdown") or payload.get("text") or json.dumps(payload, indent=2)
         path.write_text(content, encoding="utf-8")

@@ -151,6 +151,14 @@ def test_execute_run_end_to_end_with_fake_llm(env):
         procedures = s.query(models.MemoryItem).filter_by(mem_type="procedural").all()
         assert len(procedures) == 1
 
+        methodology = next(a for a in artifacts if a.kind == "methodology")
+        text = json.loads(methodology.payload_json)["markdown"]
+        assert "## Data" in text
+        assert "fake:GDP1" in text
+        assert "ETS" in text
+        assert "naive baseline" in text.lower()
+        assert "## Workflow" in text
+
 
 def test_execute_run_marks_failure_when_llm_unavailable(env):
     factory, ids = env
