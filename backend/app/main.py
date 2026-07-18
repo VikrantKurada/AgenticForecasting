@@ -10,6 +10,7 @@ from app.routers import (
     chat,
     chats,
     datasources,
+    files,
     integrations,
     projects,
     providers,
@@ -51,4 +52,5 @@ def create_app(
     app.include_router(integrations.router)
     app.include_router(chat.router)
     app.include_router(telemetry.router)
+    app.include_router(files.router)
     return app
