@@ -1,9 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.connectors.registry import build_connectors
 from app.db import init_db, make_engine, make_session_factory
 from app.llm.builder import build_registry
-from app.routers import chats, projects, providers
+from app.routers import chats, datasources, projects, providers
 
 
 def create_app(session_factory=None) -> FastAPI:
@@ -15,6 +16,7 @@ def create_app(session_factory=None) -> FastAPI:
     app = FastAPI(title="Agentic Forecasting", version="0.1.0")
     app.state.session_factory = session_factory
     app.state.llm_registry = build_registry(session_factory)
+    app.state.connectors = build_connectors(session_factory)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
@@ -30,4 +32,5 @@ def create_app(session_factory=None) -> FastAPI:
     app.include_router(projects.router)
     app.include_router(chats.router)
     app.include_router(providers.router)
+    app.include_router(datasources.router)
     return app
