@@ -120,13 +120,49 @@ def _preferences_suffix(preferences: dict | None) -> str:
     if not preferences:
         return ""
     parts = []
-    if preferences.get("source"):
-        parts.append(f"prefer data source '{preferences['source']}'")
+    sources = preferences.get("sources") or (
+        [preferences["source"]] if preferences.get("source") else []
+    )
+    if sources:
+        quoted = ", ".join(f"'{s}'" for s in sources)
+        parts.append(f"prefer data source{'s' if len(sources) > 1 else ''} {quoted}")
     if preferences.get("horizon"):
         parts.append(f"forecast horizon: {preferences['horizon']} periods")
     if preferences.get("history_years"):
         parts.append(f"use about {preferences['history_years']} years of history")
     return f"\n\n[User preferences: {'; '.join(parts)}]" if parts else ""
+
+
+def _attachments_suffix(session_factory, chat_id: str, project_id: str) -> str:
+    import json as _json
+
+    with session_factory() as s:
+        files = (
+            s.query(models.UploadedFile)
+            .filter(
+                (models.UploadedFile.chat_id == chat_id)
+                | ((models.UploadedFile.project_id == project_id)
+                   & (models.UploadedFile.chat_id.is_(None)))
+            )
+            .all()
+        )
+    if not files:
+        return ""
+    lines = []
+    for file in files:
+        columns = _json.loads(file.columns_json or "{}")
+        series = ", ".join(
+            f"'{file.id}:{c}'" for c in columns.get("numeric_columns", [])
+        )
+        lines.append(
+            f"- {file.filename} ({file.n_rows} rows; date column: "
+            f"{columns.get('date_column') or 'none'}) — fetch with source 'uploads', "
+            f"series_id {series}"
+        )
+    return (
+        "\n\n[Attached data files — treat these as first-class data sources:\n"
+        + "\n".join(lines) + "\n]"
+    )
 
 
 def handle_message(
@@ -161,6 +197,7 @@ def handle_message(
 
     if intent == "forecast_request":
         question = content + _preferences_suffix(preferences)
+        question += _attachments_suffix(session_factory, chat_id, project_id)
         with session_factory() as s:
             run = models.Run(chat_id=chat_id, project_id=project_id, question=question)
             s.add(run)

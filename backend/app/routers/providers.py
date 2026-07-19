@@ -25,6 +25,9 @@ class ProviderSettingsUpdate(BaseModel):
 
 @router.get("")
 def get_providers(request: Request, db=Depends(get_db)):
+    from app.config import reload_settings
+
+    reload_settings()
     cfg = load_provider_settings(request.app.state.session_factory)
     return {
         "order": cfg["order"],
@@ -64,8 +67,10 @@ class ProviderTest(BaseModel):
 
 @router.post("/test")
 def test_provider(body: ProviderTest, request: Request):
+    from app.config import reload_settings
     from app.llm.builder import _make_adapter
 
+    reload_settings()
     cfg = load_provider_settings(request.app.state.session_factory)
     if not provider_key_present(body.provider):
         raise HTTPException(status_code=400, detail=f"{body.provider}: no API key configured")

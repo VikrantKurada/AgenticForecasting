@@ -5,6 +5,7 @@ their connectors can ship later without another settings change.
 """
 
 CATEGORIES = [
+    "Your Data",
     "Sovereign & Macroeconomic",
     "Aggregators",
     "Equities, Forex & Crypto",
@@ -29,6 +30,9 @@ FIC = "Fixed Income & Commodities"
 ALT = "Alternative, Civic & Real Estate"
 
 SOURCES: list[dict] = [
+    # --- Your Data ----------------------------------------------------------
+    _src("uploads", "Uploaded files (CSV/Excel)", "Your Data", implemented=True,
+         note="Data files you attach to chats and projects. No key needed."),
     # --- Sovereign & Macroeconomic -----------------------------------------
     _src("fred", "FRED (Federal Reserve)", SOVEREIGN, needs_key=True, implemented=True,
          note="US macro/financial series. Free key: fred.stlouisfed.org."),

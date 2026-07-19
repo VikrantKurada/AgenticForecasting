@@ -16,6 +16,7 @@ from app.routers import (
     projects,
     providers,
     telemetry,
+    uploads,
 )
 
 
@@ -55,4 +56,5 @@ def create_app(
     app.include_router(telemetry.router)
     app.include_router(files.router)
     app.include_router(mcp_settings.router)
+    app.include_router(uploads.router)
     return app

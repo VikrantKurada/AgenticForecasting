@@ -31,3 +31,14 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
+
+def reload_settings() -> Settings:
+    """Re-read env vars and backend/.env into the shared singleton.
+
+    Lets 'paste a key, click Test' work without restarting the server.
+    """
+    fresh = Settings()
+    for name in type(settings).model_fields:
+        setattr(settings, name, getattr(fresh, name))
+    return settings

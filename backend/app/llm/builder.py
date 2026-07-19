@@ -61,6 +61,9 @@ def _make_adapter(name: str):
 
 
 def build_registry(session_factory) -> LLMRegistry:
+    from app.config import reload_settings
+
+    reload_settings()
     cfg = load_provider_settings(session_factory)
     adapters: dict = {}
     chain: list[tuple[str, str]] = []

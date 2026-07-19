@@ -125,6 +125,21 @@ def test_preferences_flow_into_run_question(client):
     assert messages[0]["content"] == "Nowcast US GDP growth"
 
 
+def test_multiple_sources_flow_into_run_question(client):
+    test_client, factory, cid = client
+    resp = test_client.post(
+        f"/api/chats/{cid}/messages",
+        json={
+            "content": "Nowcast US GDP growth",
+            "preferences": {"sources": ["fred", "ecb", "dbnomics"], "horizon": 4},
+        },
+    )
+    run_id = resp.json()["run_id"]
+    question = test_client.get(f"/api/runs/{run_id}").json()["question"]
+    for source in ("fred", "ecb", "dbnomics"):
+        assert source in question
+
+
 def test_followup_answers_from_run_context(client):
     test_client, factory, cid = client
     test_client.post(

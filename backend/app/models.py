@@ -166,6 +166,19 @@ class ResourceSample(Base):
     ts: Mapped[str] = mapped_column(String(40), default=utcnow)
 
 
+class UploadedFile(Base):
+    __tablename__ = "uploaded_files"
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=new_id)
+    project_id: Mapped[str] = mapped_column(String(32), index=True)
+    chat_id: Mapped[str | None] = mapped_column(String(32), index=True, nullable=True)
+    filename: Mapped[str] = mapped_column(String(300))
+    stored_path: Mapped[str] = mapped_column(Text)
+    columns_json: Mapped[str] = mapped_column(Text, default="{}")
+    n_rows: Mapped[int] = mapped_column(Integer, default=0)
+    created_at: Mapped[str] = mapped_column(String(40), default=utcnow)
+
+
 class AppSetting(Base):
     __tablename__ = "app_settings"
 

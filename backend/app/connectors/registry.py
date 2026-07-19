@@ -12,6 +12,7 @@ from app.connectors.keys import get_datasource_key
 from app.connectors.oecd import OECDConnector
 from app.connectors.stubs import StubConnector
 from app.connectors.treasury import TreasuryConnector
+from app.connectors.uploads import UploadsConnector
 from app.connectors.worldbank import WorldBankConnector
 
 
@@ -35,6 +36,8 @@ def _implemented_connectors(session_factory) -> dict:
 def build_connectors(session_factory) -> dict:
     connectors = _implemented_connectors(session_factory)
     cached = {name: CachedConnector(conn, session_factory) for name, conn in connectors.items()}
+    # Uploaded files change during a session — never cache them
+    cached["uploads"] = UploadsConnector(session_factory)
     for source in SOURCES:
         if source["name"] in cached:
             continue
