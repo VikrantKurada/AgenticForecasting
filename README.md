@@ -123,3 +123,35 @@ backend/   FastAPI + SQLAlchemy (SQLite) + SSE
 ```
 
 Design and plan documents live in `docs/plans/`.
+
+## Acknowledgements
+
+This project stands on generously provided public data and open-source software.
+
+**Data providers** — all data is fetched live from the providers' public APIs and
+remains subject to their respective terms of use:
+
+- Federal Reserve Bank of St. Louis — this product uses the FRED® API but is not
+  endorsed or certified by the Federal Reserve Bank of St. Louis
+- The World Bank (Indicators API, CC BY 4.0) · International Monetary Fund (IMF Data
+  Services) · OECD (SDMX API) · European Central Bank (Data Portal) · U.S. Bureau of
+  Labor Statistics · U.S. Department of the Treasury (Fiscal Data) · U.S. Energy
+  Information Administration · FAO (FAOSTAT, CC BY 4.0)
+- DBnomics (Cepremap) — open aggregation of 80+ statistical providers
+- Alpha Vantage — market data API
+
+**Open-source software:** FastAPI, Starlette, SQLAlchemy, pydantic, pandas, NumPy,
+statsmodels, scikit-learn, httpx, sse-starlette, openpyxl, psutil, ddgs, the Model
+Context Protocol SDK; React, Vite, TypeScript, Tailwind CSS, Plotly.js,
+react-plotly.js, Zustand, react-markdown — thank you to all maintainers and
+contributors.
+
+**LLM providers & SDKs:** Anthropic (Claude), OpenAI, Google (Gemini), NVIDIA
+(NIM), and Ollama.
+
+Built with [Claude Code](https://claude.com/claude-code) using Claude Fable 5 by
+Anthropic.
+
+**Disclaimer:** this software is for research and educational purposes. Forecasts
+are statistical estimates with uncertainty — nothing produced by this application
+is financial or investment advice.
