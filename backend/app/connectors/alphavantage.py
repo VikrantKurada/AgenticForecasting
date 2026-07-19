@@ -43,9 +43,7 @@ class AlphaVantageConnector:
             for code, title in CATALOG
             if any(w in title.lower() or w in code.lower() for w in words)
         ]
-        return (hits or [
-            SeriesMeta(source=self.source, series_id=c, title=t) for c, t in CATALOG
-        ])[:limit]
+        return hits[:limit]  # no match means no match — never return filler
 
     def fetch(self, series_id: str, **params) -> SeriesData:
         if not self.api_key:

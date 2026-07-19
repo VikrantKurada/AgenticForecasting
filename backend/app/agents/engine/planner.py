@@ -55,11 +55,28 @@ KIND_KEYWORDS = {
 }
 
 
+# Retrospective phrasing. Checked after the specific forecasting kinds so that
+# "forecast the yield curve trend" still plans a yield-curve run.
+HISTORY_KEYWORDS = [
+    "how has", "how have", "how did", "over the last", "over the past",
+    "historical", "history of", "changed", "change in", "evolution", "trend",
+    "compare", "comparison", " versus ", " vs ", "since 19", "since 20",
+]
+FORWARD_LOOKING = [
+    "forecast", "nowcast", "predict", "projection", "outlook",
+    "next year", "next quarter", "next month", "will ", "going to",
+]
+
+
 def classify_kind(question: str) -> str:
     q = question.lower()
     for kind, words in KIND_KEYWORDS.items():
         if any(w in q for w in words):
             return kind
+    # A purely retrospective question gets a describe-and-chart workflow; if it
+    # also looks forward, fall through to a forecasting plan instead.
+    if any(w in q for w in HISTORY_KEYWORDS) and not any(w in q for w in FORWARD_LOOKING):
+        return "history"
     return "generic"
 
 
@@ -96,7 +113,34 @@ def validate_plan(raw: dict) -> dict:
     return plan.model_dump()
 
 
+def _history_template(question: str) -> dict:
+    """Describe-and-chart workflow: no forecasting step, because the user asked
+    what happened, not what happens next."""
+    nodes = [
+        {"id": "scout", "role": "data_scout", "depends_on": [],
+         "instructions": f"Question: {question}\nIdentify the series that answer it "
+                         "directly, at the highest frequency available, covering the "
+                         "full period asked about. Name exact sources and series ids."},
+        {"id": "fetch", "role": "data_fetcher", "depends_on": ["scout"],
+         "instructions": "Fetch every series the scout recommended over the full "
+                         "requested period. Report stored series_keys and date ranges."},
+        {"id": "charts", "role": "chart_builder", "depends_on": ["fetch"],
+         "instructions": "Chart the history: an indicator panel of the series, a "
+                         "decomposition of the main one, a distribution of its "
+                         "changes, a correlation heatmap if several were fetched, "
+                         "and a data table of each series."},
+        {"id": "explain", "role": "explainer", "depends_on": ["charts"],
+         "instructions": f"Describe what the fetched data actually shows, answering: "
+                         f"{question}. Quote real dated values from the series — "
+                         "levels, turning points, and total change over the period. "
+                         "Do not forecast."},
+    ]
+    return {"kind": "history", "nodes": nodes, "metadata": {"source": "template"}}
+
+
 def _template(kind: str, question: str) -> dict:
+    if kind == "history":
+        return _history_template(question)
     fetch_note = {
         "nowcast": "monthly high-frequency indicators plus the quarterly target series",
         "default_risk": "debt/GDP, external debt, reserves, growth and fiscal series for the country",
@@ -139,13 +183,18 @@ Available roles:
 {roles}
 
 Respond with JSON only:
-{{"kind": "<nowcast|default_risk|yield_curve|geopolitical|generic>",
+{{"kind": "<nowcast|default_risk|yield_curve|geopolitical|history|generic>",
   "nodes": [{{"id": "<short id>", "role": "<role>", "instructions": "<specific instructions>",
              "depends_on": ["<ids>"]}}]}}
 
 Rules: 3-7 nodes; the DAG must be acyclic; every plan ends with an explainer node;
 include a chart_builder node; instructions must be concrete (name indicators, sources,
-models, horizons where possible)."""
+models, horizons where possible).
+
+Use kind "history" when the user asks what already happened rather than what will
+happen ("how has X changed over the last N years"). A history plan fetches and
+charts the real series and skips the modeler and validator — do not invent a
+forecast the user did not ask for."""
 
 
 def make_plan(llm, question: str, memory, project_id: str | None) -> dict:

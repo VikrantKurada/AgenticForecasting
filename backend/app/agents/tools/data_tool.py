@@ -26,6 +26,14 @@ def search_series(args, ctx):
     out = {"results": results}
     if errors:
         out["source_errors"] = errors
+    if not results:
+        out["note"] = (
+            f"No series matched '{query}'"
+            + (f" in source '{source}'" if source else " in any source")
+            + ". Try different keywords, or a known series id directly — searching "
+            "again with near-identical wording will not help. If you already know "
+            "the id (e.g. FRED 'DEXINUS'), skip search and call fetch_series."
+        )
     return out
 
 

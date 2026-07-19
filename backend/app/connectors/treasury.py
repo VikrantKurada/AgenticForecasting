@@ -42,10 +42,7 @@ class TreasuryConnector:
             for sid, spec in CATALOG.items()
             if any(w in spec[3].lower() or w in sid for w in words)
         ]
-        return (hits or [
-            SeriesMeta(source=self.source, series_id=sid, title=spec[3])
-            for sid, spec in CATALOG.items()
-        ])[:limit]
+        return hits[:limit]  # no match means no match — never return filler
 
     def fetch(self, series_id: str, **params) -> SeriesData:
         spec = CATALOG.get(series_id)

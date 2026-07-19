@@ -1,7 +1,7 @@
 import type { Data as PlotlyData, Layout as PlotlyLayout } from 'plotly.js'
 import { useState } from 'react'
-import Markdown from 'react-markdown'
 import type { Artifact, Plan, Run, TraceSpan } from '../../types'
+import MarkdownBody from '../MarkdownBody'
 import { DownloadIcon } from '../icons'
 import Plot from './Plot'
 
@@ -172,9 +172,9 @@ function MarkdownArtifacts({
     <div className="space-y-3 p-3">
       {docs.map((doc) => (
         <ArtifactCard key={doc.id} artifact={doc} onSave={onSave}>
-          <div className="prose prose-sm prose-slate max-h-[70vh] max-w-none overflow-y-auto px-1 dark:prose-invert [&_h1]:text-base [&_h2]:text-sm [&_h3]:text-[13px] [&_table]:text-xs">
-            <Markdown>{String(doc.payload.markdown ?? '')}</Markdown>
-          </div>
+          <MarkdownBody className="max-h-[70vh] overflow-y-auto px-1">
+            {String(doc.payload.markdown ?? '')}
+          </MarkdownBody>
         </ArtifactCard>
       ))}
     </div>
@@ -199,9 +199,9 @@ export function ReportTab({
     <div className="space-y-3 p-3">
       {reports.map((doc) => (
         <ArtifactCard key={doc.id} artifact={doc} onSave={onSave}>
-          <div className="prose prose-sm prose-slate max-w-none px-1 dark:prose-invert [&_h1]:text-base [&_h2]:text-sm [&_h3]:text-[13px] [&_table]:text-xs">
-            <Markdown>{String(doc.payload.markdown ?? '')}</Markdown>
-          </div>
+          <MarkdownBody className="px-1">
+            {String(doc.payload.markdown ?? '')}
+          </MarkdownBody>
         </ArtifactCard>
       ))}
 

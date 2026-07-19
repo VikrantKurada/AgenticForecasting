@@ -17,6 +17,21 @@ FORECAST_WORDS = (
     "probability", "risk of", "default", "trajectory", "yield", "estimate",
     "next quarter", "next year", "where is", "heading", "spillover", "impact of",
 )
+# An explicit ask for a chart or data always starts a run, even mid-conversation.
+# Without this, a chat-only reply that says "I can't draw charts" traps the user
+# in a loop: no run exists, so the follow-up is treated as chat, so no run exists.
+OUTPUT_REQUEST_WORDS = (
+    "chart", "graph", "plot", "visuali", "time series", "timeseries",
+    "show me", "generate", "draw", "display", "table of",
+)
+# Historical and comparative questions are data runs too: the platform's job is
+# to fetch the real series and chart it, not to describe it from model memory.
+DATA_QUESTION_WORDS = (
+    "how has", "how have", "how did", "over the last", "over the past",
+    "historical", "history of", "trend", "changed", "change in", "evolution",
+    "exchange rate", "compare", "comparison", " versus ", " vs ",
+    "data for", "series for", "since 19", "since 20",
+)
 FOLLOWUP_WORDS = (
     "why", "how did", "how was", "explain", "what model", "which model",
     "methodology", "what data", "caveat", "confidence", "accurate",
@@ -25,9 +40,11 @@ FOLLOWUP_WORDS = (
 
 def classify_intent(content: str, has_prior_run: bool) -> str:
     lowered = content.lower()
+    if any(w in lowered for w in OUTPUT_REQUEST_WORDS):
+        return "forecast_request"
     if has_prior_run and any(w in lowered for w in FOLLOWUP_WORDS):
         return "followup"
-    if any(w in lowered for w in FORECAST_WORDS):
+    if any(w in lowered for w in FORECAST_WORDS + DATA_QUESTION_WORDS):
         return "forecast_request"
     if has_prior_run:
         return "followup"
@@ -266,10 +283,18 @@ def handle_message(
         return {"intent": intent, "user_message": user_message, "assistant_message": assistant}
 
     resp = state["llm_registry"].complete(
-        "You are a professional macroeconomic forecasting assistant. The user has not "
-        "asked for a forecast yet; reply briefly and suggest what you can forecast "
-        "(GDP/inflation nowcasts, sovereign default risk, yield curves, geopolitical "
-        "spillovers).",
+        "You are the greeting layer of an agentic macroeconomic forecasting platform. "
+        "The user has not yet asked a data question. Reply in two or three sentences "
+        "and suggest what the platform can do: fetch official series and chart them, "
+        "nowcast GDP/inflation, sovereign default risk, yield curves, geopolitical "
+        "spillovers.\n\n"
+        "Critical: this platform DOES fetch real data and render real interactive "
+        "charts — a team of agents does that in the output panel. Never say you "
+        "cannot produce charts or images, never describe yourself as 'just a chat "
+        "interface', and never output code for the user to run as a substitute for "
+        "doing the work. If they want a chart or a series, tell them to ask for it "
+        "directly (e.g. 'chart GBP/INR over the last 20 years') and the agents will "
+        "fetch and plot it.",
         [{"role": "user", "content": content}],
         project_id=project_id, agent_role="assistant",
     )

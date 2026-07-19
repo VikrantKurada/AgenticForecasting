@@ -167,9 +167,17 @@ def _run_node(
             last_error_signature = None
             identical_errors = 0
         messages.append({"role": "assistant", "content": resp.text})
-        messages.append(
-            {"role": "user", "content": json.dumps(result, default=str)[:MAX_TOOL_RESULT_CHARS]}
-        )
+        feedback = json.dumps(result, default=str)[:MAX_TOOL_RESULT_CHARS]
+        # A node that spends its whole budget exploring produces nothing. Warn it
+        # in time to do the work it was actually assigned.
+        remaining = max_iterations - iteration - 1
+        if 0 < remaining <= 2:
+            feedback += (
+                f"\n\n[Only {remaining} step{'s' if remaining > 1 else ''} left. "
+                "Stop exploring: perform your assignment's core action now, then "
+                "finish with what you have.]"
+            )
+        messages.append({"role": "user", "content": feedback})
     return messages[-1]["content"][:2000] if messages else ""
 
 

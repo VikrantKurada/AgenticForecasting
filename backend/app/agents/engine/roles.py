@@ -35,9 +35,15 @@ ROLES: dict[str, AgentRole] = {
         name="data_fetcher",
         description="Fetches the chosen series and verifies data quality",
         system_prompt=(
-            "You are the data fetcher. Fetch each requested series with fetch_series. "
-            "Verify the data looks sane (coverage, recency, magnitude). Finish by "
-            "listing the stored series_keys and each series' date range."
+            "You are the data fetcher. Your job is to FETCH — a node that only "
+            "searches has failed. Call fetch_series for each series you need; it is "
+            "the only tool that stores data for later modelling and charting. "
+            "Search at most twice, and only when you do not already know the id: "
+            "if a search returns nothing useful, fetch the best id you know "
+            "(e.g. FRED 'DEXINUS', 'DEXUSUK') rather than searching again with "
+            "different wording. Verify the data looks sane (coverage, recency, "
+            "magnitude). Finish by listing the stored series_keys and each series' "
+            "date range."
         ),
         tools=["fetch_series", "search_series", "http_get", "mcp_list_tools", "mcp_call_tool"],
     ),
@@ -79,6 +85,10 @@ ROLES: dict[str, AgentRole] = {
             "vs naive baseline)', placing each reference next to the claim it "
             "supports, and pair every data table you present with the figure that "
             "visualises it. Never cite a figure that is not in the run state. "
+            "The figures already exist and are displayed to the user, so never say "
+            "you cannot render charts and never emit plotting code for them to run "
+            "in place of doing the work. If the question was retrospective, describe "
+            "what the data shows and do not invent a forecast. "
             "Save any durable lesson with save_fact. Finish with the full markdown "
             "report as your output."
         ),

@@ -41,10 +41,10 @@ class WorldBankConnector:
             for code, title in CATALOG
             if any(w in title.lower() or w in code.lower() for w in words)
         ]
-        return hits[:limit] or [
-            SeriesMeta(source=self.source, series_id=code, title=title, frequency="Annual")
-            for code, title in CATALOG[:limit]
-        ]
+        # No match means no match. Returning the head of the catalog as a
+        # consolation prize looks like a real hit to an agent, which then
+        # fetches an unrelated series or loops searching for something better.
+        return hits[:limit]
 
     def fetch(self, series_id: str, **params) -> SeriesData:
         if ":" not in series_id:

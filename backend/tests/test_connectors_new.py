@@ -128,17 +128,25 @@ def test_alphavantage_surfaces_api_errors():
 
 
 def test_all_new_connectors_have_curated_search():
-    connectors = [
-        DBnomicsConnector(),
-        TreasuryConnector(),
-        EIAConnector(api_key="k"),
-        FAOSTATConnector(),
-        AlphaVantageConnector(api_key="k"),
+    # Each connector gets a term its own catalog actually covers. Searching one
+    # generic word across all of them only ever "passed" because a no-match used
+    # to fall back to catalog filler, which misleads the agents downstream.
+    cases = [
+        (DBnomicsConnector(), "production"),
+        (TreasuryConnector(), "debt"),
+        (EIAConnector(api_key="k"), "production"),
+        (FAOSTATConnector(), "production"),
+        (AlphaVantageConnector(api_key="k"), "exchange"),
     ]
-    for conn in connectors:
-        results = conn.search("production")
-        assert results, f"{conn.source} search returned nothing"
+    for conn, term in cases:
+        results = conn.search(term)
+        assert results, f"{conn.source} search returned nothing for {term!r}"
         assert all(r.source == conn.source for r in results)
+
+
+def test_curated_search_returns_nothing_for_an_unrelated_term():
+    for conn in (TreasuryConnector(), EIAConnector(api_key="k"), FAOSTATConnector()):
+        assert conn.search("zzzz nonexistent qqqq") == [], conn.source
 
 
 def test_registry_wires_new_connectors(tmp_path):

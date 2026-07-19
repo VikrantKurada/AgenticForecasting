@@ -1,5 +1,5 @@
-import Markdown from 'react-markdown'
 import type { Message } from '../../types'
+import MarkdownBody from '../MarkdownBody'
 
 export default function MessageList({
   messages,
@@ -20,9 +20,9 @@ export default function MessageList({
         ) : (
           <div key={message.id} className="flex justify-start">
             <div className="max-w-[92%] text-sm leading-relaxed">
-              <div className="prose prose-sm prose-slate max-w-none dark:prose-invert [&_code]:rounded [&_code]:bg-slate-100 [&_code]:px-1 [&_code]:py-0.5 [&_code]:text-[12px] dark:[&_code]:bg-slate-800 [&_h1]:text-lg [&_h2]:text-base [&_h3]:text-sm [&_table]:text-xs">
-                <Markdown>{message.content}</Markdown>
-              </div>
+              <MarkdownBody className="[&_h1]:text-lg [&_h2]:text-base [&_h3]:text-sm">
+                {message.content}
+              </MarkdownBody>
               {message.run_id && (
                 <button
                   onClick={() => onOpenRun(message.run_id!)}

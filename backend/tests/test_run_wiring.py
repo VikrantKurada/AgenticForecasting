@@ -78,8 +78,12 @@ def run_env(tmp_path):
 
 
 def prompt_for_role(fake: FakeLLM, role_marker: str) -> str:
-    """The user-turn prompt of the first call made by a given agent role."""
-    call = next(c for c in fake.calls if role_marker in c["system"])
+    """The user-turn prompt of the first call made by a given agent role.
+
+    Match on the role's opening sentence, not a bare phrase: role prompts
+    mention each other, so "chart builder" alone also matches the fetcher.
+    """
+    call = next(c for c in fake.calls if f"You are the {role_marker}" in c["system"])
     return call["messages"][0]["content"]
 
 
@@ -98,7 +102,7 @@ def test_modeler_is_told_the_series_key_the_fetcher_stored(run_env):
 
 def test_explainer_is_told_which_figures_exist(run_env):
     _outcome, fake, _factory, _run_id = run_env
-    prompt = prompt_for_role(fake, "You are the explainer")
+    prompt = prompt_for_role(fake, "explainer")
     assert "Figure 1: [chart] GDP fan chart" in prompt
     assert "Figure 2: [table] Underlying data" in prompt
 
@@ -129,3 +133,37 @@ def test_run_still_produces_the_chart_artifacts(run_env):
     assert "table" in kinds
     assert "report" in kinds
     assert "methodology" in kinds
+
+
+def test_a_node_running_out_of_steps_is_warned_to_act(tmp_path):
+    """A node that spends its whole budget exploring produces nothing.
+
+    The data_fetcher once made 8 search_series calls, never called fetch_series,
+    and left the run with no data and therefore no charts.
+    """
+    from app.agents.engine.executor import _run_node
+    from app.agents.tools import ToolContext, build_toolbelt
+
+    engine = make_engine(f"sqlite:///{(tmp_path / 'budget.db').as_posix()}")
+    init_db(engine)
+    factory = make_session_factory(engine)
+    # never finishes — always searches, so the budget runs out
+    search = json.dumps({"action": "tool", "tool": "search_series",
+                         "args": {"query": "gbp inr"}})
+    fake = FakeLLM([search] * 6)
+    llm = LLMRegistry(factory, adapters={"fake": fake}, chain=[("fake", "fake-1")])
+    ctx = ToolContext(
+        session_factory=factory, connectors={"fake": FakeConnector()}, memory=None
+    )
+    _run_node(
+        {"id": "fetch", "role": "data_fetcher", "instructions": "Fetch it",
+         "depends_on": []},
+        belt=build_toolbelt(), ctx=ctx, llm=llm, dep_outputs={},
+        session_factory=factory, bus=RunEventBus(), run_id="r1", project_id="p1",
+        node_span=None, max_iterations=4, question="q",
+    )
+    turns = "\n".join(
+        str(m.get("content", "")) for c in fake.calls for m in c["messages"]
+    )
+    assert "step left" in turns or "steps left" in turns
+    assert "finish with what you have" in turns
