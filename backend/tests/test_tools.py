@@ -129,3 +129,20 @@ def test_mcp_tools_report_when_unconfigured(belt, ctx):
 def test_unknown_tool_returns_error(belt, ctx):
     result = execute_tool(belt, "does_not_exist", {}, ctx)
     assert "error" in result
+
+
+def test_run_model_error_lists_available_series_keys(belt, ctx):
+    execute_tool(belt, "fetch_series", {"source": "fake", "series_id": "GDP1"}, ctx)
+    result = execute_tool(
+        belt, "run_model", {"model": "arima", "series_key": "wrong-key", "horizon": 2}, ctx
+    )
+    assert "error" in result
+    assert "fake:GDP1" in result["error"]
+
+
+def test_worldbank_error_suggests_country_prefix():
+    from app.connectors.base import ConnectorError
+    from app.connectors.worldbank import WorldBankConnector
+
+    with pytest.raises(ConnectorError, match="US:NY.GDP.MKTP.KD.ZG"):
+        WorldBankConnector().fetch("NY.GDP.MKTP.KD.ZG")

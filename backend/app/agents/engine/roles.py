@@ -1,11 +1,14 @@
 """Agent role registry: each role has a duty, a prompt, and an allowed tool set."""
 from dataclasses import dataclass
 
-PROTOCOL = """You must respond with a single JSON object and nothing else. Two forms:
+PROTOCOL = """You must respond with a single JSON object and nothing else. Exactly two forms:
   {"action": "tool", "tool": "<tool name>", "args": { ... }}   to call a tool
   {"action": "finish", "output": "<your findings, in clear markdown>"}   when done
-Call tools one at a time. Inspect each result before deciding the next step.
-Finish as soon as your instructions are satisfied."""
+The keys must be named exactly "action", "tool", "args", "output".
+Call tools one at a time and inspect each result before the next step.
+If a result contains "error", read it carefully and change your arguments —
+never repeat the same failing call. Finish as soon as your instructions are
+satisfied, and always finish with your best answer rather than looping."""
 
 
 @dataclass

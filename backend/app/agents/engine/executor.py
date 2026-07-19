@@ -30,9 +30,13 @@ def _tool_docs(belt, allowed: list[str]) -> str:
     return "\n".join(lines)
 
 
+MAX_IDENTICAL_ERRORS = 3
+
+
 def _run_node(
     node: dict, *, belt, ctx: ToolContext, llm, dep_outputs: dict,
     session_factory, bus, run_id, project_id, node_span, max_iterations,
+    question: str = "",
 ):
     role = ROLES[node["role"]]
     system = (
@@ -41,8 +45,16 @@ def _run_node(
     dep_context = "\n\n".join(
         f"Output from '{dep}':\n{dep_outputs[dep]}" for dep in node.get("depends_on", []) if dep in dep_outputs
     )
-    user = node["instructions"] + (f"\n\n{dep_context}" if dep_context else "")
+    # Every node sees the overall task: attachment notes and user preferences
+    # live in the question, and agents must not lose them.
+    user = (
+        (f"Overall task:\n{question}\n\n" if question else "")
+        + f"Your assignment: {node['instructions']}"
+        + (f"\n\n{dep_context}" if dep_context else "")
+    )
     messages = [{"role": "user", "content": user}]
+    last_error_signature = None
+    identical_errors = 0
 
     for iteration in range(max_iterations):
         resp = llm.complete(
@@ -76,6 +88,22 @@ def _run_node(
                 "result_summary": json.dumps(result, default=str)[:800],
             },
         )
+        if "error" in result:
+            signature = (tool_name, json.dumps(tool_args, sort_keys=True, default=str),
+                         str(result.get("error"))[:200])
+            if signature == last_error_signature:
+                identical_errors += 1
+            else:
+                last_error_signature = signature
+                identical_errors = 1
+            if identical_errors >= MAX_IDENTICAL_ERRORS:
+                return (
+                    f"Stopped after repeating the same failing call {identical_errors} "
+                    f"times: {tool_name} -> {result.get('error')}"
+                )
+        else:
+            last_error_signature = None
+            identical_errors = 0
         messages.append({"role": "assistant", "content": resp.text})
         messages.append(
             {"role": "user", "content": json.dumps(result, default=str)[:MAX_TOOL_RESULT_CHARS]}
@@ -135,7 +163,7 @@ def execute_run(
                             node, belt=belt, ctx=ctx, llm=llm, dep_outputs=dep_outputs,
                             session_factory=session_factory, bus=bus, run_id=run_id,
                             project_id=project_id, node_span=span,
-                            max_iterations=max_node_iterations,
+                            max_iterations=max_node_iterations, question=question,
                         )
                         _emit(
                             "node_finished", actor=f"agent:{node['role']}",

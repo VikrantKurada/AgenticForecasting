@@ -49,7 +49,8 @@ class WorldBankConnector:
     def fetch(self, series_id: str, **params) -> SeriesData:
         if ":" not in series_id:
             raise ConnectorError(
-                f"World Bank series id must be 'COUNTRY:INDICATOR', got '{series_id}'"
+                f"World Bank series id must be 'COUNTRY:INDICATOR', got '{series_id}'. "
+                f"Example for the United States: 'US:{series_id}'"
             )
         country, indicator = series_id.split(":", 1)
         payload = request_json(

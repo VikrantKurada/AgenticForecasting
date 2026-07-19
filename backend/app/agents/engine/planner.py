@@ -10,6 +10,29 @@ from app.agents.engine.roles import ROLES
 _JSON_BLOCK = re.compile(r"\{.*\}", re.DOTALL)
 
 
+_TOOL_ACTIONS = {"tool", "tool_call", "call_tool", "use_tool", "tool_use"}
+_FINISH_ACTIONS = {"finish", "final", "final_answer", "done", "answer", "respond"}
+
+
+def _normalize_action(parsed: dict) -> dict:
+    """Map the JSON shapes different LLMs emit onto the canonical protocol."""
+    tool = parsed.get("tool") or parsed.get("tool_name") or parsed.get("name") or ""
+    args = (
+        parsed.get("args")
+        or parsed.get("arguments")
+        or parsed.get("parameters")
+        or parsed.get("input")
+        or {}
+    )
+    action = str(parsed.get("action", "")).lower()
+    if action in _FINISH_ACTIONS:
+        return {"action": "finish",
+                "output": parsed.get("output") or parsed.get("answer") or parsed.get("text", "")}
+    if action in _TOOL_ACTIONS or (not action and tool):
+        return {"action": "tool", "tool": str(tool), "args": args if isinstance(args, dict) else {}}
+    return parsed
+
+
 def parse_action(text: str) -> dict | None:
     """Extract the first JSON object from an LLM reply (tolerates fences/prose)."""
     text = text.strip()
@@ -17,7 +40,7 @@ def parse_action(text: str) -> dict | None:
         try:
             parsed = json.loads(candidate)
             if isinstance(parsed, dict):
-                return parsed
+                return _normalize_action(parsed)
         except json.JSONDecodeError:
             continue
     return None

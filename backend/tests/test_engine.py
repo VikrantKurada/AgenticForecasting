@@ -48,6 +48,22 @@ def test_parse_action_handles_fences_and_prose():
     assert parse_action("no json here") is None
 
 
+def test_parse_action_tolerates_common_llm_variants():
+    # alternative key names for the tool
+    variant = parse_action('{"action": "tool_call", "tool_name": "fetch_series", "arguments": {"a": 1}}')
+    assert variant["action"] == "tool"
+    assert variant["tool"] == "fetch_series"
+    assert variant["args"] == {"a": 1}
+    # tool implied without an action field
+    implied = parse_action('{"name": "run_model", "parameters": {"model": "arima"}}')
+    assert implied["action"] == "tool"
+    assert implied["tool"] == "run_model"
+    assert implied["args"] == {"model": "arima"}
+    # finish variants
+    done = parse_action('{"action": "final_answer", "output": "all done"}')
+    assert done["action"] == "finish"
+
+
 def test_classify_kind_keywords():
     assert classify_kind("Nowcast US GDP for this quarter") == "nowcast"
     assert classify_kind("probability Argentina defaults on its debt") == "default_risk"
@@ -158,6 +174,48 @@ def test_execute_run_end_to_end_with_fake_llm(env):
         assert "ETS" in text
         assert "naive baseline" in text.lower()
         assert "## Workflow" in text
+
+
+def test_every_node_sees_the_overall_question(env):
+    factory, ids = env
+    plan_json = json.dumps({
+        "kind": "generic",
+        "nodes": [
+            {"id": "only", "role": "data_fetcher",
+             "instructions": "Fetch what is needed", "depends_on": []},
+        ],
+    })
+    fake = FakeLLM([plan_json, json.dumps({"action": "finish", "output": "done"})])
+    llm = LLMRegistry(factory, adapters={"fake": fake}, chain=[("fake", "fake-1")])
+    memory = MemoryService(SQLiteMemoryBackend(factory), factory)
+    execute_run(
+        ids["run"], session_factory=factory, llm=llm,
+        connectors={"fake": FakeConnector()}, memory=memory, bus=RunEventBus(),
+    )
+    node_call = fake.calls[1]  # call 0 is the planner
+    assert "Nowcast US GDP growth" in node_call["messages"][0]["content"]
+
+
+def test_repeated_identical_tool_errors_abort_the_loop(env):
+    factory, ids = env
+    plan_json = json.dumps({
+        "kind": "generic",
+        "nodes": [
+            {"id": "n", "role": "modeler", "instructions": "model it", "depends_on": []},
+        ],
+    })
+    bad_call = json.dumps({"action": "tool", "tool": "run_model",
+                           "args": {"model": "arima", "series_key": "missing", "horizon": 2}})
+    fake = FakeLLM([plan_json] + [bad_call] * 10)
+    llm = LLMRegistry(factory, adapters={"fake": fake}, chain=[("fake", "fake-1")])
+    memory = MemoryService(SQLiteMemoryBackend(factory), factory)
+    outcome = execute_run(
+        ids["run"], session_factory=factory, llm=llm,
+        connectors={}, memory=memory, bus=RunEventBus(),
+    )
+    assert outcome["status"] == "completed"
+    # planner + at most 3 identical failing attempts, not the full 8-iteration budget
+    assert len(fake.calls) <= 5
 
 
 def test_execute_run_marks_failure_when_llm_unavailable(env):

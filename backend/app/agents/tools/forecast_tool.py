@@ -14,7 +14,11 @@ def list_models(args, ctx):
 def _series_for(ctx, key: str) -> pd.Series:
     data = ctx.data_store.get(key)
     if data is None:
-        raise KeyError(f"No fetched series under key '{key}'. Call fetch_series first.")
+        available = sorted(ctx.data_store) or ["<none fetched yet>"]
+        raise KeyError(
+            f"No fetched series under key '{key}'. Available series_keys: {available}. "
+            "Call fetch_series first."
+        )
     return to_series(data.observations, name=key)
 
 
