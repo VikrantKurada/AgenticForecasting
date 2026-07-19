@@ -58,7 +58,19 @@ export interface Artifact {
 
 export interface RunPreferences {
   source?: string
+  sources?: string[]
   horizon?: number
+}
+
+export interface UploadedFileMeta {
+  id: string
+  project_id: string
+  chat_id: string | null
+  scope: 'chat' | 'project'
+  filename: string
+  columns: { date_column: string | null; numeric_columns: string[]; all_columns: string[] }
+  n_rows: number
+  created_at: string
 }
 
 export interface RunEvent {

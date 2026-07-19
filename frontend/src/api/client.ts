@@ -11,6 +11,7 @@ import type {
   Run,
   RunPreferences,
   TraceSpan,
+  UploadedFileMeta,
   UsageSummary,
 } from '../types'
 
@@ -59,6 +60,18 @@ export const api = {
       `/api/projects/${projectId}/export`,
       { method: 'POST', body: JSON.stringify({ directory }) },
     ),
+
+  // attachments (multipart — no JSON content-type header)
+  uploadChatFile: async (chatId: string, file: File): Promise<UploadedFileMeta> => {
+    const form = new FormData()
+    form.append('file', file)
+    const resp = await fetch(`/api/chats/${chatId}/files`, { method: 'POST', body: form })
+    if (!resp.ok) throw new Error(await resp.text())
+    return resp.json()
+  },
+  listChatFiles: (chatId: string) => request<UploadedFileMeta[]>(`/api/chats/${chatId}/files`),
+  deleteUploadedFile: (fileId: string) =>
+    request<void>(`/api/files/${fileId}`, { method: 'DELETE' }),
 
   // runs
   getRun: (id: string) => request<Run>(`/api/runs/${id}`),

@@ -9,7 +9,7 @@ import ExportDialog from '../components/ExportDialog'
 import OutputPanel from '../components/OutputPanel'
 import { DownloadIcon } from '../components/icons'
 import { useAppStore } from '../store/useAppStore'
-import type { Message, Plan, RunPreferences } from '../types'
+import type { Message, Plan, RunPreferences, UploadedFileMeta } from '../types'
 
 export default function ChatPage() {
   const { chatId } = useParams<{ chatId: string }>()
@@ -25,6 +25,8 @@ export default function ChatPage() {
   const [panelRunId, setPanelRunId] = useState<string | null>(null)
   const [exporting, setExporting] = useState(false)
   const [sources, setSources] = useState<{ name: string; label: string }[]>([])
+  const [files, setFiles] = useState<UploadedFileMeta[]>([])
+  const [uploading, setUploading] = useState(false)
   const [error, setError] = useState('')
   const bottomRef = useRef<HTMLDivElement>(null)
 
@@ -63,7 +65,33 @@ export default function ChatPage() {
         setChatTitle(chat.title)
       })
       .catch(() => undefined)
+    api.listChatFiles(chatId).then(setFiles).catch(() => undefined)
   }, [chatId, setActiveChat])
+
+  const onAttach = useCallback(
+    async (file: File) => {
+      if (!chatId) return
+      setUploading(true)
+      setError('')
+      try {
+        await api.uploadChatFile(chatId, file)
+        setFiles(await api.listChatFiles(chatId))
+      } catch (e) {
+        setError(`Upload failed: ${e}`)
+      } finally {
+        setUploading(false)
+      }
+    },
+    [chatId],
+  )
+
+  const onRemoveFile = useCallback(
+    async (fileId: string) => {
+      await api.deleteUploadedFile(fileId).catch(() => undefined)
+      if (chatId) setFiles(await api.listChatFiles(chatId).catch(() => []))
+    },
+    [chatId],
+  )
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -171,10 +199,15 @@ export default function ChatPage() {
         <div className="border-t border-slate-200 px-6 py-3 dark:border-slate-800">
           <div className="mx-auto max-w-3xl">
             <Composer
+              chatId={chatId ?? ''}
               onSend={onSend}
               busy={busy}
               showSuggestions={messages.length === 0}
               sources={sources}
+              files={files}
+              uploading={uploading}
+              onAttach={onAttach}
+              onRemoveFile={onRemoveFile}
             />
           </div>
         </div>
