@@ -25,11 +25,16 @@ decision is traceable, and every token is accounted for.
 - **Charts:** fan charts with confidence bands, model-comparison overlays, trend/seasonal
   decompositions, change distributions, correlation heatmaps, indicator panels, backtest
   comparisons, yield curves, and data tables in a resizable Fragments-style output panel
-  (Charts / Data / Report / Methodology / Trace tabs).
+  (Charts / Data / Report / Method / Steps / Trace tabs). Every chart and table is
+  numbered as a Figure; the report cites those figures and renders them inline.
+- **Orchestrator you can replay:** the Steps tab shows the run's workflow DAG — each
+  agent step, what it depends on, the tools it called, and its output — and lets you
+  edit any step's instructions and rerun the whole workflow without re-planning.
 - **Per-run methodology:** a dedicated Methodology tab documents the workflow DAG, data
   provenance, every model's parameters and fit statistics, how uncertainty bands were
   derived, and the backtest verdict — generated from what the run actually did.
-- **Chats & exports:** chats auto-name from the first question and can be renamed; per-run
+- **Chats & exports:** chats auto-name from the first question; projects and chats can be
+  renamed inline in the sidebar (double-click or the pencil button); per-run
   data source and horizon preferences; one-click export of a chat or a whole project
   (transcript, reports, methodology, charts as HTML, data as CSV, trace JSON) into a
   folder on your Desktop.
@@ -99,7 +104,7 @@ Open http://localhost:5173 — create a project in the sidebar, open a chat, and
 ## Tests
 
 ```powershell
-cd backend; .venv\Scripts\python -m pytest      # 89 tests, all offline
+cd backend; .venv\Scripts\python -m pytest      # 162 tests, all offline
 cd frontend; npx vitest run                      # store tests
 ```
 
@@ -109,7 +114,7 @@ cd frontend; npx vitest run                      # store tests
 frontend/  React + Vite + TS + Tailwind + Plotly
   src/components/Sidebar        collapsible projects/chats
   src/components/Chat           streaming chat + live workflow progress (SSE)
-  src/components/OutputPanel    Charts / Data / Report / Trace + save dialog
+  src/components/OutputPanel    Charts / Data / Report / Method / Steps / Trace + save dialog
   src/pages                     Usage dashboard, Settings
 
 backend/   FastAPI + SQLAlchemy (SQLite) + SSE

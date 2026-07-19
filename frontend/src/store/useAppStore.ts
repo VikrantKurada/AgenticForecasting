@@ -11,9 +11,11 @@ interface AppState {
 
   loadProjects: (q?: string) => Promise<void>
   createProject: (name: string) => Promise<Project>
+  renameProject: (id: string, name: string) => Promise<void>
   deleteProject: (id: string) => Promise<void>
   loadChats: (projectId: string) => Promise<void>
   createChat: (projectId: string, title?: string) => Promise<Chat>
+  renameChat: (projectId: string, chatId: string, title: string) => Promise<void>
   deleteChat: (projectId: string, chatId: string) => Promise<void>
   setActiveChat: (projectId: string, chatId: string) => void
   toggleSidebar: () => void
@@ -35,6 +37,13 @@ export const useAppStore = create<AppState>((set, get) => ({
     const project = await api.createProject(name)
     set({ projects: [project, ...get().projects] })
     return project
+  },
+
+  renameProject: async (id, name) => {
+    const trimmed = name.trim()
+    if (!trimmed) return
+    const updated = await api.renameProject(id, trimmed)
+    set({ projects: get().projects.map((p) => (p.id === id ? updated : p)) })
   },
 
   deleteProject: async (id) => {
@@ -59,6 +68,19 @@ export const useAppStore = create<AppState>((set, get) => ({
     const existing = get().chatsByProject[projectId] ?? []
     set({ chatsByProject: { ...get().chatsByProject, [projectId]: [chat, ...existing] } })
     return chat
+  },
+
+  renameChat: async (projectId, chatId, title) => {
+    const trimmed = title.trim()
+    if (!trimmed) return
+    const updated = await api.renameChat(chatId, trimmed)
+    const existing = get().chatsByProject[projectId] ?? []
+    set({
+      chatsByProject: {
+        ...get().chatsByProject,
+        [projectId]: existing.map((c) => (c.id === chatId ? updated : c)),
+      },
+    })
   },
 
   deleteChat: async (projectId, chatId) => {

@@ -44,6 +44,30 @@ describe('useAppStore', () => {
     expect(useAppStore.getState().chatsByProject['p1'][0].title).toBe('Nowcast')
   })
 
+  it('renameProject replaces the project in place', async () => {
+    useAppStore.setState({ projects })
+    stubFetch({ ...projects[0], name: 'US Macro 2026' })
+    await useAppStore.getState().renameProject('p1', 'US Macro 2026')
+    const listed = useAppStore.getState().projects
+    expect(listed.map((p) => p.name)).toEqual(['US Macro 2026', 'EU Inflation'])
+  })
+
+  it('renameProject ignores a blank name without calling the API', async () => {
+    useAppStore.setState({ projects })
+    const fetchSpy = vi.fn()
+    vi.stubGlobal('fetch', fetchSpy)
+    await useAppStore.getState().renameProject('p1', '   ')
+    expect(fetchSpy).not.toHaveBeenCalled()
+    expect(useAppStore.getState().projects[0].name).toBe('US Macro')
+  })
+
+  it('renameChat updates the chat under its project', async () => {
+    useAppStore.setState({ chatsByProject: { p1: chats } })
+    stubFetch({ ...chats[0], title: 'UK unemployment' })
+    await useAppStore.getState().renameChat('p1', 'c1', 'UK unemployment')
+    expect(useAppStore.getState().chatsByProject['p1'][0].title).toBe('UK unemployment')
+  })
+
   it('toggleSidebar flips the collapsed flag', () => {
     expect(useAppStore.getState().sidebarCollapsed).toBe(false)
     useAppStore.getState().toggleSidebar()

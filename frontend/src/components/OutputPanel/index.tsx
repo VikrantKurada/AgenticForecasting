@@ -1,11 +1,18 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { api } from '../../api/client'
-import type { Artifact, Run, TraceSpan } from '../../types'
+import type { Artifact, Plan, Run, TraceSpan } from '../../types'
 import { XIcon } from '../icons'
 import SaveDialog from './SaveDialog'
-import { ChartsTab, DataTab, MethodologyTab, ReportTab, TraceTab } from './tabs'
+import {
+  ChartsTab,
+  DataTab,
+  MethodologyTab,
+  OrchestratorTab,
+  ReportTab,
+  TraceTab,
+} from './tabs'
 
-type Tab = 'charts' | 'data' | 'report' | 'methodology' | 'trace'
+type Tab = 'charts' | 'data' | 'report' | 'methodology' | 'orchestrator' | 'trace'
 
 const MIN_WIDTH = 340
 const DEFAULT_WIDTH = 460
@@ -18,15 +25,20 @@ function clampWidth(width: number): number {
 export default function OutputPanel({
   runId,
   onClose,
+  onRerun,
 }: {
   runId: string
   onClose: () => void
+  /** Called with the new run id after a rerun is started. */
+  onRerun?: (newRunId: string) => void
 }) {
   const [run, setRun] = useState<Run | null>(null)
   const [artifacts, setArtifacts] = useState<Artifact[]>([])
   const [spans, setSpans] = useState<TraceSpan[]>([])
   const [tab, setTab] = useState<Tab>('charts')
   const [saveTarget, setSaveTarget] = useState<Artifact | null>(null)
+  const [rerunning, setRerunning] = useState(false)
+  const [rerunError, setRerunError] = useState('')
   const [width, setWidth] = useState(() =>
     clampWidth(Number(localStorage.getItem('outputPanelWidth')) || DEFAULT_WIDTH),
   )
@@ -66,11 +78,28 @@ export default function OutputPanel({
     localStorage.setItem('outputPanelWidth', String(widthRef.current))
   }, [])
 
+  const startRerun = useCallback(
+    async (plan?: Plan) => {
+      setRerunning(true)
+      setRerunError('')
+      try {
+        const { run_id } = await api.rerunRun(runId, plan)
+        onRerun?.(run_id)
+      } catch (e) {
+        setRerunError(String(e))
+      } finally {
+        setRerunning(false)
+      }
+    },
+    [runId, onRerun],
+  )
+
   const counts = {
     charts: artifacts.filter((a) => a.kind === 'chart').length,
     data: artifacts.filter((a) => a.kind === 'table').length,
     report: artifacts.filter((a) => a.kind === 'report').length,
     methodology: artifacts.filter((a) => a.kind === 'methodology').length,
+    orchestrator: run?.plan?.nodes.length ?? 0,
     trace: spans.length,
   }
 
@@ -78,7 +107,8 @@ export default function OutputPanel({
     { key: 'charts', label: 'Charts', count: counts.charts },
     { key: 'data', label: 'Data', count: counts.data },
     { key: 'report', label: 'Report', count: counts.report },
-    { key: 'methodology', label: 'Methodology', count: counts.methodology },
+    { key: 'methodology', label: 'Method', count: counts.methodology },
+    { key: 'orchestrator', label: 'Steps', count: counts.orchestrator },
     { key: 'trace', label: 'Trace', count: counts.trace },
   ]
 
@@ -136,6 +166,21 @@ export default function OutputPanel({
         {tab === 'report' && <ReportTab artifacts={artifacts} onSave={setSaveTarget} />}
         {tab === 'methodology' && (
           <MethodologyTab artifacts={artifacts} onSave={setSaveTarget} />
+        )}
+        {tab === 'orchestrator' && (
+          <>
+            {rerunError && (
+              <p className="m-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-300">
+                {rerunError}
+              </p>
+            )}
+            <OrchestratorTab
+              run={run}
+              spans={spans}
+              busy={rerunning}
+              onRerun={startRerun}
+            />
+          </>
         )}
         {tab === 'trace' && <TraceTab spans={spans} />}
       </div>

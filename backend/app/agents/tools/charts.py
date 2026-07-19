@@ -34,9 +34,66 @@ def _add_artifact(ctx, title: str, figure: dict, kind: str = "chart") -> dict:
     return {"status": "created", "artifact_index": len(ctx.artifacts) - 1, "title": title}
 
 
+def _data_for(ctx, key):
+    """Fetch a stored series, failing with the list of keys that *do* exist.
+
+    A bare KeyError leaves the chart builder guessing names it can never hit;
+    naming the available keys lets it self-correct on the next call.
+    """
+    if not isinstance(key, str) or not key:
+        raise KeyError(
+            f"'series_key' is required and must be a string. "
+            f"Available series_keys: {sorted(ctx.data_store) or '<none fetched yet>'}."
+        )
+    data = ctx.data_store.get(key)
+    if data is None:
+        available = sorted(ctx.data_store) or ["<none fetched yet>"]
+        raise KeyError(
+            f"No fetched series under key '{key}'. Available series_keys: {available}. "
+            "Use one of these exact keys — they are 'source:series_id' as returned by fetch_series."
+        )
+    return data
+
+
+def _result_for(ctx, index, *, need_forecast: bool = True):
+    """Fetch a model result by index, naming what is actually available."""
+    if not ctx.results:
+        raise IndexError(
+            "No model results exist yet — run_model must succeed before this chart "
+            "can be built. Build a chart that needs only a series_key instead "
+            "(decomposition, distribution, panel, heatmap, table)."
+        )
+    catalog = [
+        f"{i}={getattr(r, 'model_name', 'yield_curve_fit')}" for i, r in enumerate(ctx.results)
+    ]
+    try:
+        idx = int(index)
+    except (TypeError, ValueError):
+        raise IndexError(f"'result_index' must be an integer. Available results: {catalog}.")
+    if not -len(ctx.results) <= idx < len(ctx.results):
+        raise IndexError(f"No result at index {idx}. Available results: {catalog}.")
+    result = ctx.results[idx]
+    if need_forecast and not hasattr(result, "point"):
+        raise IndexError(
+            f"Result {idx} is a yield-curve fit, not a forecast. Available results: {catalog}."
+        )
+    return result
+
+
+def _series_keys_arg(args, ctx) -> list[str]:
+    """Normalize the multi-series argument, tolerating a single series_key."""
+    keys = args.get("series_keys") or ([args["series_key"]] if args.get("series_key") else [])
+    if not keys:
+        raise KeyError(
+            "'series_keys' is required (a list). Available series_keys: "
+            f"{sorted(ctx.data_store) or '<none fetched yet>'}."
+        )
+    return list(keys)
+
+
 def _fan_chart(args, ctx) -> dict:
-    data = ctx.data_store[args["series_key"]]
-    result = ctx.results[int(args.get("result_index", len(ctx.results) - 1))]
+    data = _data_for(ctx, args.get("series_key"))
+    result = _result_for(ctx, args.get("result_index", len(ctx.results) - 1))
     series = to_series(data.observations)
     hist_x = [d.strftime("%Y-%m-%d") for d in series.index]
     hist_y = [float(v) for v in series.values]
@@ -59,12 +116,12 @@ def _fan_chart(args, ctx) -> dict:
 
 def _indicator_panel(args, ctx) -> dict:
     traces = []
-    for i, key in enumerate(args["series_keys"]):
-        series = to_series(ctx.data_store[key].observations)
+    for i, key in enumerate(_series_keys_arg(args, ctx)):
+        series = to_series(_data_for(ctx, key).observations)
         if args.get("indexed", True) and float(series.iloc[0]) != 0:
             series = series / float(series.iloc[0]) * 100
         traces.append(
-            {"type": "scatter", "name": ctx.data_store[key].meta.title or key,
+            {"type": "scatter", "name": _data_for(ctx, key).meta.title or key,
              "x": [d.strftime("%Y-%m-%d") for d in series.index],
              "y": [float(v) for v in series.values], "mode": "lines",
              "line": {"color": SERIES_COLORS[i % len(SERIES_COLORS)], "width": 2}}
@@ -74,7 +131,7 @@ def _indicator_panel(args, ctx) -> dict:
 
 
 def _backtest_chart(args, ctx) -> dict:
-    result = ctx.results[int(args.get("result_index", len(ctx.results) - 1))]
+    result = _result_for(ctx, args.get("result_index", len(ctx.results) - 1))
     bt = result.backtest
     if "model_rmse" not in bt:
         raise ValueError(f"Result has no backtest metrics: {bt.get('note', 'missing')}")
@@ -92,7 +149,12 @@ def _backtest_chart(args, ctx) -> dict:
 
 
 def _yield_curve_chart(args, ctx) -> dict:
-    result = ctx.results[int(args.get("result_index", len(ctx.results) - 1))]
+    result = _result_for(ctx, args.get("result_index", len(ctx.results) - 1), need_forecast=False)
+    if not isinstance(result, dict) or "fitted_curve" not in result:
+        raise IndexError(
+            f"Result {args.get('result_index')} is not a yield-curve fit — "
+            "call fit_yield_curve first and use the result_index it returns."
+        )
     observed = result["observed"]
     fitted = result["fitted_curve"]
     traces = [
@@ -112,7 +174,7 @@ def _yield_curve_chart(args, ctx) -> dict:
 def _decomposition_chart(args, ctx) -> dict:
     from app.forecasting.series import infer_periods_per_year, to_series
 
-    series = to_series(ctx.data_store[args["series_key"]].observations)
+    series = to_series(_data_for(ctx, args.get("series_key")).observations)
     x = [d.strftime("%Y-%m-%d") for d in series.index]
     period = infer_periods_per_year(series)
     seasonal = None
@@ -164,7 +226,7 @@ def _distribution_chart(args, ctx) -> dict:
 
     from app.forecasting.series import to_series
 
-    series = to_series(ctx.data_store[args["series_key"]].observations)
+    series = to_series(_data_for(ctx, args.get("series_key")).observations)
     # Percent changes only make sense for strictly positive level series;
     # rates that cross zero get absolute changes instead.
     use_pct = bool(args.get("pct", True)) and (series > 0).all()
@@ -194,13 +256,23 @@ def _heatmap_chart(args, ctx) -> dict:
 
     from app.forecasting.series import to_series
 
-    keys = args["series_keys"]
+    keys = _series_keys_arg(args, ctx)
+    if len(keys) < 2:
+        raise KeyError(
+            "A correlation heatmap needs at least 2 series_keys. Available: "
+            f"{sorted(ctx.data_store) or '<none fetched yet>'}."
+        )
     frame = pd.DataFrame(
-        {key: to_series(ctx.data_store[key].observations) for key in keys}
+        {key: to_series(_data_for(ctx, key).observations) for key in keys}
     ).dropna()
+    if frame.empty:
+        raise ValueError(
+            "These series have no overlapping dates, so no correlation can be computed. "
+            "Pick series that cover a common period."
+        )
     changes = frame.pct_change().dropna()
     corr = (changes if len(changes) >= 8 else frame).corr()
-    labels = [ctx.data_store[k].meta.title[:40] or k for k in keys]
+    labels = [(_data_for(ctx, k).meta.title or k)[:40] for k in keys]
     layout = _layout(args.get("title", "Correlation matrix"))
     layout["xaxis"] = {"tickangle": -30}
     return {
@@ -218,7 +290,7 @@ def _heatmap_chart(args, ctx) -> dict:
 
 
 def _model_compare_chart(args, ctx) -> dict:
-    data = ctx.data_store[args["series_key"]]
+    data = _data_for(ctx, args.get("series_key"))
     series = to_series(data.observations)
     tail = series.iloc[-24:]
     traces = [
@@ -229,7 +301,7 @@ def _model_compare_chart(args, ctx) -> dict:
     ]
     indices = args.get("result_indices") or list(range(len(ctx.results)))
     for i, idx in enumerate(indices):
-        result = ctx.results[int(idx)]
+        result = _result_for(ctx, idx, need_forecast=False)
         if not hasattr(result, "point"):
             continue
         traces.append(
@@ -255,7 +327,7 @@ def build_chart(args, ctx):
         "model_compare": _model_compare_chart,
     }
     if kind == "table":
-        data = ctx.data_store[args["series_key"]]
+        data = _data_for(ctx, args.get("series_key"))
         payload = {
             "columns": ["date", "value"],
             "rows": [[d, v] for d, v in data.observations],

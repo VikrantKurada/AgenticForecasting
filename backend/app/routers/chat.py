@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from sse_starlette.sse import EventSourceResponse
 
 from app import models
-from app.agents.pipeline import handle_message
+from app.agents.pipeline import handle_message, rerun
 from app.deps import get_db
 
 router = APIRouter(prefix="/api", tags=["chat"])
@@ -15,6 +15,10 @@ router = APIRouter(prefix="/api", tags=["chat"])
 class MessageIn(BaseModel):
     content: str
     preferences: dict | None = None
+
+
+class RerunIn(BaseModel):
+    plan: dict | None = None
 
 
 def _state(request: Request) -> dict:
@@ -53,6 +57,37 @@ def get_run(run_id: str, db=Depends(get_db)):
         "plan": json.loads(run.plan_json) if run.plan_json else None,
         "error": run.error, "started_at": run.started_at, "finished_at": run.finished_at,
     }
+
+
+@router.post("/runs/{run_id}/rerun")
+def rerun_run(run_id: str, body: RerunIn, request: Request):
+    """Replay a run's orchestrator DAG — optionally with user-edited steps."""
+    try:
+        return rerun(
+            _state(request), run_id, plan=body.plan,
+            inline=getattr(request.app.state, "run_inline", False),
+        )
+    except KeyError:
+        raise HTTPException(status_code=404, detail="Run not found")
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+
+
+@router.get("/chats/{chat_id}/runs")
+def list_chat_runs(chat_id: str, db=Depends(get_db)):
+    """Every run of a chat, newest first — the chat's orchestrator history."""
+    runs = (
+        db.query(models.Run)
+        .filter_by(chat_id=chat_id)
+        .order_by(models.Run.started_at.desc())
+        .all()
+    )
+    return [
+        {"id": r.id, "question": r.question, "status": r.status,
+         "plan": json.loads(r.plan_json) if r.plan_json else None,
+         "error": r.error, "started_at": r.started_at, "finished_at": r.finished_at}
+        for r in runs
+    ]
 
 
 @router.get("/runs/{run_id}/artifacts")

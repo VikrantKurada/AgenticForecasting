@@ -9,14 +9,44 @@ import {
   DownloadIcon,
   GearIcon,
   PanelLeftIcon,
+  PencilIcon,
   PlusIcon,
   TrashIcon,
 } from './icons'
 
+/** Inline rename field: Enter commits, Escape/blur cancels. */
+function RenameInput({
+  initial,
+  onCommit,
+  onCancel,
+}: {
+  initial: string
+  onCommit: (value: string) => void
+  onCancel: () => void
+}) {
+  const [value, setValue] = useState(initial)
+  return (
+    <input
+      autoFocus
+      value={value}
+      onChange={(e) => setValue(e.target.value)}
+      onClick={(e) => e.stopPropagation()}
+      onKeyDown={(e) => {
+        e.stopPropagation()
+        if (e.key === 'Enter') onCommit(value)
+        if (e.key === 'Escape') onCancel()
+      }}
+      onBlur={onCancel}
+      className="min-w-0 flex-1 rounded border border-slate-400 bg-white px-1.5 py-0.5 text-sm outline-none dark:border-slate-500 dark:bg-slate-950"
+    />
+  )
+}
+
 export default function Sidebar() {
   const {
     projects, chatsByProject, activeProjectId, activeChatId, sidebarCollapsed,
-    loadProjects, createProject, deleteProject, loadChats, createChat, deleteChat,
+    loadProjects, createProject, renameProject, deleteProject,
+    loadChats, createChat, renameChat, deleteChat,
     setActiveChat, toggleSidebar,
   } = useAppStore()
   const navigate = useNavigate()
@@ -24,6 +54,8 @@ export default function Sidebar() {
   const [expanded, setExpanded] = useState<Record<string, boolean>>({})
   const [creating, setCreating] = useState(false)
   const [newName, setNewName] = useState('')
+  // id of the project or chat currently being renamed inline
+  const [renaming, setRenaming] = useState<string | null>(null)
   const [exportTarget, setExportTarget] = useState<{ id: string; name: string } | null>(null)
 
   useEffect(() => {
@@ -151,14 +183,34 @@ export default function Sidebar() {
                 activeProjectId === project.id ? 'bg-slate-200/70 dark:bg-slate-800' : ''
               }`}
             >
-              <button
-                onClick={() => toggleProject(project.id)}
-                className="flex min-w-0 flex-1 items-center gap-1.5 text-left"
-              >
-                <ChevronIcon
-                  className={`h-3 w-3 text-slate-400 transition-transform ${expanded[project.id] ? 'rotate-90' : ''}`}
+              {renaming === project.id ? (
+                <RenameInput
+                  initial={project.name}
+                  onCommit={async (value) => {
+                    await renameProject(project.id, value)
+                    setRenaming(null)
+                  }}
+                  onCancel={() => setRenaming(null)}
                 />
-                <span className="truncate font-medium">{project.name}</span>
+              ) : (
+                <button
+                  onClick={() => toggleProject(project.id)}
+                  onDoubleClick={() => setRenaming(project.id)}
+                  title={`${project.name} — double-click to rename`}
+                  className="flex min-w-0 flex-1 items-center gap-1.5 text-left"
+                >
+                  <ChevronIcon
+                    className={`h-3 w-3 text-slate-400 transition-transform ${expanded[project.id] ? 'rotate-90' : ''}`}
+                  />
+                  <span className="truncate font-medium">{project.name}</span>
+                </button>
+              )}
+              <button
+                onClick={() => setRenaming(project.id)}
+                title="Rename project"
+                className="hidden rounded p-1 text-slate-400 hover:text-slate-700 group-hover:block dark:hover:text-slate-200"
+              >
+                <PencilIcon className="h-3 w-3" />
               </button>
               <button
                 onClick={() => onNewChat(project.id)}
@@ -194,12 +246,34 @@ export default function Sidebar() {
                         : 'text-slate-600 dark:text-slate-300'
                     }`}
                   >
-                    <button
-                      onClick={() => onOpenChat(project.id, chat.id)}
-                      className="min-w-0 flex-1 truncate text-left"
-                    >
-                      {chat.title}
-                    </button>
+                    {renaming === chat.id ? (
+                      <RenameInput
+                        initial={chat.title}
+                        onCommit={async (value) => {
+                          await renameChat(project.id, chat.id, value)
+                          setRenaming(null)
+                        }}
+                        onCancel={() => setRenaming(null)}
+                      />
+                    ) : (
+                      <>
+                        <button
+                          onClick={() => onOpenChat(project.id, chat.id)}
+                          onDoubleClick={() => setRenaming(chat.id)}
+                          title={`${chat.title} — double-click to rename`}
+                          className="min-w-0 flex-1 truncate text-left"
+                        >
+                          {chat.title}
+                        </button>
+                        <button
+                          onClick={() => setRenaming(chat.id)}
+                          title="Rename chat"
+                          className="hidden rounded p-0.5 text-slate-400 hover:text-slate-700 group-hover:block dark:hover:text-slate-200"
+                        >
+                          <PencilIcon className="h-3 w-3" />
+                        </button>
+                      </>
+                    )}
                     <button
                       onClick={() => deleteChat(project.id, chat.id)}
                       title="Delete chat"

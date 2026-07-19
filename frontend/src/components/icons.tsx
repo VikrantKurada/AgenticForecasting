@@ -30,6 +30,24 @@ export function TrashIcon({ className = 'w-3.5 h-3.5' }: IconProps) {
   )
 }
 
+export function PencilIcon({ className = 'w-3.5 h-3.5' }: IconProps) {
+  return (
+    <svg className={`${base} ${className}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M12 20h9" />
+      <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+    </svg>
+  )
+}
+
+export function RerunIcon({ className = 'w-3.5 h-3.5' }: IconProps) {
+  return (
+    <svg className={`${base} ${className}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M21 12a9 9 0 1 1-2.64-6.36" />
+      <path d="M21 3v6h-6" />
+    </svg>
+  )
+}
+
 export function ChevronIcon({ className = 'w-3.5 h-3.5' }: IconProps) {
   return (
     <svg className={`${base} ${className}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">

@@ -3,8 +3,11 @@ import json
 import logging
 import threading
 
+from pydantic import ValidationError
+
 from app import models
 from app.agents.engine.executor import execute_run
+from app.agents.engine.planner import validate_plan
 from app.events import record_event
 
 logger = logging.getLogger(__name__)
@@ -50,12 +53,12 @@ def _persist_message(session_factory, chat_id: str, role: str, content: str, run
                 "run_id": run_id, "created_at": msg.created_at}
 
 
-def _run_and_persist_answer(state, run_id: str, chat_id: str):
+def _run_and_persist_answer(state, run_id: str, chat_id: str, preset_plan: dict | None = None):
     outcome = execute_run(
         run_id,
         session_factory=state["session_factory"], llm=state["llm_registry"],
         connectors=state["connectors"], memory=state["memory_service"],
-        bus=state["run_bus"],
+        bus=state["run_bus"], preset_plan=preset_plan,
     )
     if outcome["status"] == "completed":
         content = outcome.get("summary") or "The forecast run completed. See the output panel."
@@ -111,6 +114,50 @@ def _answer_followup(state, chat_id: str, content: str) -> str:
         run_id=run.id if run else None, agent_role="explainer",
     )
     return resp.text
+
+
+def rerun(state, run_id: str, *, plan: dict | None = None, inline: bool = False) -> dict:
+    """Re-execute a past run's workflow as a new run in the same chat.
+
+    `plan` lets the user edit the orchestrator DAG (node instructions, roles,
+    dependencies) before replaying it; omitted, the original plan is reused.
+    """
+    session_factory = state["session_factory"]
+    with session_factory() as s:
+        source = s.get(models.Run, run_id)
+        if source is None:
+            raise KeyError("Run not found")
+        chat_id, project_id, question = source.chat_id, source.project_id, source.question
+        preset_plan = plan if plan is not None else (
+            json.loads(source.plan_json) if source.plan_json else None
+        )
+        if preset_plan is None:
+            raise ValueError("Original run has no plan to rerun")
+        # Reject a bad edit up front rather than starting a run doomed to fail.
+        try:
+            validate_plan(preset_plan)
+        except (ValidationError, ValueError) as exc:
+            raise ValueError(f"Invalid workflow plan: {exc}")
+        new_run = models.Run(chat_id=chat_id, project_id=project_id, question=question)
+        s.add(new_run)
+        s.flush()
+        new_run_id = new_run.id
+        record_event(
+            s, actor="user", event_type="run_rerun",
+            project_id=project_id,
+            payload={"source_run_id": run_id, "run_id": new_run_id,
+                     "edited": plan is not None},
+        )
+        s.commit()
+
+    if inline:
+        assistant = _run_and_persist_answer(state, new_run_id, chat_id, preset_plan)
+        return {"run_id": new_run_id, "source_run_id": run_id, "assistant_message": assistant}
+    threading.Thread(
+        target=_run_and_persist_answer,
+        args=(state, new_run_id, chat_id, preset_plan), daemon=True,
+    ).start()
+    return {"run_id": new_run_id, "source_run_id": run_id}
 
 
 AUTO_NAME_DEFAULTS = ("New chat", "")

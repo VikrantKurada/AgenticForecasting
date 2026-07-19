@@ -74,6 +74,11 @@ ROLES: dict[str, AgentRole] = {
             "forecast headline, the numbers with uncertainty, and a Methodology "
             "section that describes what data was used, which model, why, and how it "
             "backtested — grounded in what the team actually did, never boilerplate. "
+            "The run state lists the figures already produced for this run. Reference "
+            "them in your prose by their exact label, e.g. '(see Figure 2 — Backtest "
+            "vs naive baseline)', placing each reference next to the claim it "
+            "supports, and pair every data table you present with the figure that "
+            "visualises it. Never cite a figure that is not in the run state. "
             "Save any durable lesson with save_fact. Finish with the full markdown "
             "report as your output."
         ),

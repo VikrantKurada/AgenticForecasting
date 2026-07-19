@@ -56,6 +56,13 @@ export interface Artifact {
   created_at: string
 }
 
+/** Numbering shared by the report's "Figure N" citations and the output panel. */
+export interface FigureRef {
+  number: number
+  kind: 'chart' | 'table'
+  title: string
+}
+
 export interface RunPreferences {
   source?: string
   sources?: string[]

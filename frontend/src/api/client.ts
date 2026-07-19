@@ -5,6 +5,7 @@ import type {
   DatasourceKeyStatus,
   Integration,
   Message,
+  Plan,
   PostMessageResponse,
   Project,
   ProviderInfo,
@@ -34,6 +35,8 @@ export const api = {
     request<Project[]>(`/api/projects${q ? `?q=${encodeURIComponent(q)}` : ''}`),
   createProject: (name: string, description = '') =>
     request<Project>('/api/projects', { method: 'POST', body: JSON.stringify({ name, description }) }),
+  renameProject: (id: string, name: string) =>
+    request<Project>(`/api/projects/${id}`, { method: 'PATCH', body: JSON.stringify({ name }) }),
   deleteProject: (id: string) => request<void>(`/api/projects/${id}`, { method: 'DELETE' }),
 
   // chats
@@ -75,6 +78,12 @@ export const api = {
 
   // runs
   getRun: (id: string) => request<Run>(`/api/runs/${id}`),
+  listChatRuns: (chatId: string) => request<Run[]>(`/api/chats/${chatId}/runs`),
+  rerunRun: (id: string, plan?: Plan) =>
+    request<{ run_id: string; source_run_id: string }>(`/api/runs/${id}/rerun`, {
+      method: 'POST',
+      body: JSON.stringify({ plan: plan ?? null }),
+    }),
   getRunArtifacts: (id: string) => request<Artifact[]>(`/api/runs/${id}/artifacts`),
   getRunTrace: (id: string) => request<{ run_id: string; spans: TraceSpan[] }>(`/api/runs/${id}/trace`),
 

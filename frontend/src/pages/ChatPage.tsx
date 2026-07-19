@@ -212,7 +212,17 @@ export default function ChatPage() {
           </div>
         </div>
       </div>
-      {panelRunId && <OutputPanel runId={panelRunId} onClose={() => setPanelRunId(null)} />}
+      {panelRunId && (
+        <OutputPanel
+          runId={panelRunId}
+          onClose={() => setPanelRunId(null)}
+          onRerun={(newRunId) => {
+            // Stream the replay live, exactly like a freshly asked question.
+            setPanelRunId(null)
+            setActiveRunId(newRunId)
+          }}
+        />
+      )}
       {exporting && chatId && (
         <ExportDialog
           title={`Export "${chatTitle}"`}

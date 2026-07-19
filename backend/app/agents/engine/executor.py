@@ -6,7 +6,7 @@ from graphlib import TopologicalSorter
 
 from app import models
 from app.agents.engine.events import RunEventBus, emit
-from app.agents.engine.planner import make_plan, parse_action
+from app.agents.engine.planner import make_plan, parse_action, validate_plan
 from app.agents.engine.roles import PROTOCOL, ROLES
 from app.agents.engine.sampler import ResourceSampler
 from app.agents.tools import ToolContext, build_toolbelt, execute_tool
@@ -33,6 +33,67 @@ def _tool_docs(belt, allowed: list[str]) -> str:
 MAX_IDENTICAL_ERRORS = 3
 
 
+def run_state_block(ctx) -> str:
+    """Describe the run's live state: fetched series, model results, artifacts.
+
+    Without this a downstream node has to *guess* the series_key the fetcher
+    stored, which is how chart building used to fail silently.
+    """
+    lines: list[str] = []
+    if ctx.data_store:
+        lines.append("Series already fetched — use these exact series_key values:")
+        for key, data in ctx.data_store.items():
+            obs = data.observations
+            span = f"{obs[0][0]} to {obs[-1][0]}" if obs else "empty"
+            lines.append(f"  - {key!r} — {data.meta.title} ({len(obs)} obs, {span})")
+    else:
+        lines.append("No series have been fetched yet.")
+    if ctx.results:
+        lines.append("Model results — use these exact result_index values:")
+        for i, result in enumerate(ctx.results):
+            name = getattr(result, "model_name", "yield_curve_fit")
+            lines.append(f"  - result_index {i} = {name}")
+    else:
+        lines.append("No model results yet.")
+    if ctx.artifacts:
+        lines.append("Artifacts already created:")
+        for i, artifact in enumerate(ctx.artifacts):
+            lines.append(f"  - Figure {i + 1}: [{artifact['kind']}] {artifact['title']}")
+    return "Current run state:\n" + "\n".join(lines)
+
+
+def figure_manifest(artifacts: list[dict]) -> list[dict]:
+    """Number the run's visual artifacts so report and panel agree on 'Figure N'."""
+    figures = []
+    for artifact in artifacts:
+        if artifact["kind"] in ("chart", "table"):
+            figures.append(
+                {"number": len(figures) + 1, "kind": artifact["kind"],
+                 "title": artifact["title"]}
+            )
+    return figures
+
+
+def figure_index(artifacts: list[dict]) -> str:
+    """A figure list appended to every report, so charts are always referenced.
+
+    The explainer is asked to cite figures inline, but it is an LLM — this
+    guarantees the report always points at the charts that were produced.
+    """
+    figures = figure_manifest(artifacts)
+    if not figures:
+        return ""
+    lines = ["", "", "---", "", "## Figures", ""]
+    for figure in figures:
+        label = "Data table" if figure["kind"] == "table" else "Chart"
+        lines.append(f"- **Figure {figure['number']}** — {figure['title']} ({label})")
+    lines += [
+        "",
+        "_Figures are rendered under this report and in the Charts and Data tabs._",
+    ]
+    return "\n".join(lines)
+
+
 def _run_node(
     node: dict, *, belt, ctx: ToolContext, llm, dep_outputs: dict,
     session_factory, bus, run_id, project_id, node_span, max_iterations,
@@ -51,6 +112,7 @@ def _run_node(
         (f"Overall task:\n{question}\n\n" if question else "")
         + f"Your assignment: {node['instructions']}"
         + (f"\n\n{dep_context}" if dep_context else "")
+        + f"\n\n{run_state_block(ctx)}"
     )
     messages = [{"role": "user", "content": user}]
     last_error_signature = None
@@ -113,8 +175,10 @@ def _run_node(
 
 def execute_run(
     run_id: str, *, session_factory, llm, connectors, memory, bus: RunEventBus,
-    max_node_iterations: int = 8,
+    max_node_iterations: int = 8, preset_plan: dict | None = None,
 ) -> dict:
+    """Execute a run. `preset_plan` replays an existing (or user-edited) DAG,
+    skipping the planner so a rerun reproduces exactly the requested steps."""
     with session_factory() as s:
         run = s.get(models.Run, run_id)
         project_id, chat_id, question = run.project_id, run.chat_id, run.question
@@ -127,7 +191,11 @@ def execute_run(
 
     try:
         _emit("run_started", payload={"question": question})
-        plan = make_plan(llm, question, memory, project_id)
+        if preset_plan is not None:
+            plan = validate_plan(preset_plan)
+            plan["metadata"] = {**preset_plan.get("metadata", {}), "source": "rerun"}
+        else:
+            plan = make_plan(llm, question, memory, project_id)
         with session_factory() as s:
             run = s.get(models.Run, run_id)
             run.plan_json = json.dumps(plan, default=str)
@@ -183,7 +251,8 @@ def execute_run(
         if summary:
             ctx.artifacts.append(
                 {"kind": "report", "title": f"Report — {question[:60]}",
-                 "payload": {"markdown": summary}}
+                 "payload": {"markdown": summary + figure_index(ctx.artifacts),
+                             "figures": figure_manifest(ctx.artifacts)}}
             )
         from app.agents.engine.methodology import build_methodology
 

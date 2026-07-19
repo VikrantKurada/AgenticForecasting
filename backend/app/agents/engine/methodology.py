@@ -41,8 +41,22 @@ def build_methodology(question: str, plan: dict, ctx, dep_outputs: dict) -> str:
         f"with {len(plan.get('nodes', []))} agent nodes:", "",
     ]
     for node in plan.get("nodes", []):
-        deps = ", ".join(node.get("depends_on", [])) or "—"
-        lines.append(f"- **{node['id']}** ({node['role']}), depends on: {deps}")
+        # An entry node legitimately has no dependencies; saying so beats an
+        # empty "depends on:" that reads like missing data.
+        deps = [d for d in (node.get("depends_on") or []) if d]
+        relation = (
+            "runs first (entry point, no dependencies)" if not deps
+            else f"depends on {', '.join(f'`{d}`' for d in deps)}"
+        )
+        feeds = [
+            other["id"] for other in plan.get("nodes", [])
+            if node["id"] in (other.get("depends_on") or [])
+        ]
+        feeds_note = f"; feeds {', '.join(f'`{f}`' for f in feeds)}" if feeds else "; final step"
+        lines.append(f"- **{node['id']}** — role `{node['role']}`, {relation}{feeds_note}")
+        instructions = (node.get("instructions") or "").strip().replace("\n", " ")
+        if instructions:
+            lines.append(f"  - Assignment: {instructions[:300]}")
     lines.append("")
 
     # Data
@@ -103,6 +117,15 @@ def build_methodology(question: str, plan: dict, ctx, dep_outputs: dict) -> str:
     for node_id in validator_nodes:
         if dep_outputs.get(node_id):
             lines += ["## Validation", "", dep_outputs[node_id][:2000], ""]
+
+    # Figures — same numbering the report cites, so the two documents agree
+    visuals = [a for a in ctx.artifacts if a["kind"] in ("chart", "table")]
+    if visuals:
+        lines += ["## Figures", ""]
+        for i, artifact in enumerate(visuals, start=1):
+            label = "data table" if artifact["kind"] == "table" else "chart"
+            lines.append(f"- **Figure {i}** — {artifact['title']} ({label})")
+        lines.append("")
 
     lines += [
         "## Reproducibility & caveats", "",
