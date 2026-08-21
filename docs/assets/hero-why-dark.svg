@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 606" width="1280" height="606" role="img" aria-label="Three ways this went wrong, and the mechanism that closed each">
+<title>Why this exists</title>
+<rect x="0" y="0" width="1280" height="606" rx="0" fill="#0f1319" stroke="none"/>
+<text x="44" y="54" fill="#e8ecf1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="27" font-weight="700" text-anchor="start" letter-spacing="0">Why this exists</text>
+<text x="44" y="80" fill="#93a0b1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="14" font-weight="400" text-anchor="start" letter-spacing="0">Three failures found by watching the running system, and what closed each.</text>
+<rect x="44" y="95" width="3" height="12" rx="1.5" fill="#e66767" stroke="none"/>
+<text x="56" y="104" fill="#93a0b1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12" font-weight="700" text-anchor="start" letter-spacing="1.4">THE FAILURE</text>
+<rect x="576" y="95" width="3" height="12" rx="1.5" fill="#199e70" stroke="none"/>
+<text x="588" y="104" fill="#93a0b1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12" font-weight="700" text-anchor="start" letter-spacing="1.4">THE MECHANISM</text>
+<rect x="44" y="118" width="440" height="122" rx="10" fill="#171c24" stroke="#272e39"/>
+<rect x="44" y="118" width="3" height="122" rx="1.5" fill="#e66767" stroke="none"/>
+<text x="60" y="145" fill="#e8ecf1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="14.5" font-weight="600" text-anchor="start" letter-spacing="0">Charts never reached the Charts tab</text>
+<text x="60" y="168" fill="#93a0b1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12.5" font-weight="400" text-anchor="start" letter-spacing="0">The chart builder guessed eight series keys in a row and</text>
+<text x="60" y="185" fill="#93a0b1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12.5" font-weight="400" text-anchor="start" letter-spacing="0">gave up. It could not see which key the fetcher had</text>
+<text x="60" y="202" fill="#93a0b1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12.5" font-weight="400" text-anchor="start" letter-spacing="0">stored.</text>
+<path d="M510 179.0 h40 m-6 -4.5 l6 4.5 l-6 4.5" fill="none" stroke="#6f7c8d" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="576" y="118" width="660" height="122" rx="10" fill="#171c24" stroke="#272e39"/>
+<rect x="576" y="118" width="3" height="122" rx="1.5" fill="#199e70" stroke="none"/>
+<text x="592" y="145" fill="#e8ecf1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="14.5" font-weight="600" text-anchor="start" letter-spacing="0">Errors name the valid options</text>
+<text x="1220" y="145" fill="#6f7c8d" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="11" font-weight="400" text-anchor="end" letter-spacing="0">agents/tools/charts.py</text>
+<text x="592" y="168" fill="#93a0b1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12.5" font-weight="400" text-anchor="start" letter-spacing="0">build_chart now reports the available series keys and result indices,</text>
+<text x="592" y="185" fill="#93a0b1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12.5" font-weight="400" text-anchor="start" letter-spacing="0">and every node's prompt carries the live run state.</text>
+<rect x="44" y="256" width="440" height="122" rx="10" fill="#171c24" stroke="#272e39"/>
+<rect x="44" y="256" width="3" height="122" rx="1.5" fill="#e66767" stroke="none"/>
+<text x="60" y="283" fill="#e8ecf1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="14.5" font-weight="600" text-anchor="start" letter-spacing="0">A data question never started a run</text>
+<text x="60" y="306" fill="#93a0b1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12.5" font-weight="400" text-anchor="start" letter-spacing="0">"How has GBP/INR changed?" matched no forecasting verb,</text>
+<text x="60" y="323" fill="#93a0b1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12.5" font-weight="400" text-anchor="start" letter-spacing="0">fell through to tool-less chat, and was told it could</text>
+<text x="60" y="340" fill="#93a0b1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12.5" font-weight="400" text-anchor="start" letter-spacing="0">not draw charts.</text>
+<path d="M510 317.0 h40 m-6 -4.5 l6 4.5 l-6 4.5" fill="none" stroke="#6f7c8d" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="576" y="256" width="660" height="122" rx="10" fill="#171c24" stroke="#272e39"/>
+<rect x="576" y="256" width="3" height="122" rx="1.5" fill="#199e70" stroke="none"/>
+<text x="592" y="283" fill="#e8ecf1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="14.5" font-weight="600" text-anchor="start" letter-spacing="0">The intent gate routes data questions</text>
+<text x="1220" y="283" fill="#6f7c8d" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="11" font-weight="400" text-anchor="end" letter-spacing="0">agents/pipeline.py</text>
+<text x="592" y="306" fill="#93a0b1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12.5" font-weight="400" text-anchor="start" letter-spacing="0">Retrospective and explicit chart requests now start an agent run, and a</text>
+<text x="592" y="323" fill="#93a0b1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12.5" font-weight="400" text-anchor="start" letter-spacing="0">new history plan fetches and charts without inventing a forecast.</text>
+<rect x="44" y="394" width="440" height="122" rx="10" fill="#171c24" stroke="#272e39"/>
+<rect x="44" y="394" width="3" height="122" rx="1.5" fill="#e66767" stroke="none"/>
+<text x="60" y="421" fill="#e8ecf1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="14.5" font-weight="600" text-anchor="start" letter-spacing="0">Search invented plausible results</text>
+<text x="60" y="444" fill="#93a0b1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12.5" font-weight="400" text-anchor="start" letter-spacing="0">A search for "GBP/INR" answered "GDP growth (annual %)".</text>
+<text x="60" y="461" fill="#93a0b1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12.5" font-weight="400" text-anchor="start" letter-spacing="0">Five connectors returned catalog filler when nothing</text>
+<text x="60" y="478" fill="#93a0b1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12.5" font-weight="400" text-anchor="start" letter-spacing="0">matched.</text>
+<path d="M510 455.0 h40 m-6 -4.5 l6 4.5 l-6 4.5" fill="none" stroke="#6f7c8d" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="576" y="394" width="660" height="122" rx="10" fill="#171c24" stroke="#272e39"/>
+<rect x="576" y="394" width="3" height="122" rx="1.5" fill="#199e70" stroke="none"/>
+<text x="592" y="421" fill="#e8ecf1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="14.5" font-weight="600" text-anchor="start" letter-spacing="0">No match returns nothing</text>
+<text x="1220" y="421" fill="#6f7c8d" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="11" font-weight="400" text-anchor="end" letter-spacing="0">connectors/worldbank.py</text>
+<text x="592" y="444" fill="#93a0b1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12.5" font-weight="400" text-anchor="start" letter-spacing="0">Connectors return an empty list on no match, and search_series says so,</text>
+<text x="592" y="461" fill="#93a0b1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12.5" font-weight="400" text-anchor="start" letter-spacing="0">so an agent stops re-searching and fetches a known id.</text>
+<line x1="44" y1="560" x2="1236" y2="560" stroke="#272e39" stroke-width="1" stroke-linecap="round"/>
+<text x="44" y="580" fill="#6f7c8d" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12.5" font-weight="400" text-anchor="start" letter-spacing="0">None is a prompt asking the model to behave. Each is code with a test that fails when it stops working.</text>
+</svg>

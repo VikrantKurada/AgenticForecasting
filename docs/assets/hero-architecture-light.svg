@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 540" width="1280" height="540" role="img" aria-label="Five layers from the browser down to data sources and models">
+<title>Architecture</title>
+<rect x="0" y="0" width="1280" height="540" rx="0" fill="#ffffff" stroke="none"/>
+<text x="44" y="54" fill="#14181d" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="27" font-weight="700" text-anchor="start" letter-spacing="0">Five layers, one rule per seam</text>
+<text x="44" y="80" fill="#5b6675" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="14" font-weight="400" text-anchor="start" letter-spacing="0">Each layer talks only to the one below it, through an interface it does not own.</text>
+<rect x="44" y="120" width="1192" height="62" rx="10" fill="#fafafa" stroke="#e3e7ec"/>
+<rect x="44" y="120" width="3" height="62" rx="1.5" fill="#2a78d6" stroke="none"/>
+<text x="62" y="156.0" fill="#14181d" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="16" font-weight="700" text-anchor="start" letter-spacing="0">Frontend</text>
+<text x="244" y="156.0" fill="#5b6675" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="13" font-weight="400" text-anchor="start" letter-spacing="0">React + Vite + Plotly. Chat, live run stream, resizable output panel.</text>
+<rect x="44" y="196" width="1192" height="62" rx="10" fill="#fafafa" stroke="#e3e7ec"/>
+<rect x="44" y="196" width="3" height="62" rx="1.5" fill="#4a3aa7" stroke="none"/>
+<text x="62" y="232.0" fill="#14181d" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="16" font-weight="700" text-anchor="start" letter-spacing="0">API</text>
+<text x="244" y="232.0" fill="#5b6675" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="13" font-weight="400" text-anchor="start" letter-spacing="0">FastAPI, 40 endpoints across 10 routers. SSE for live runs.</text>
+<rect x="44" y="272" width="1192" height="62" rx="10" fill="#fafafa" stroke="#e3e7ec"/>
+<rect x="44" y="272" width="3" height="62" rx="1.5" fill="#1baf7a" stroke="none"/>
+<text x="62" y="308.0" fill="#14181d" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="16" font-weight="700" text-anchor="start" letter-spacing="0">Engine</text>
+<text x="244" y="308.0" fill="#5b6675" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="13" font-weight="400" text-anchor="start" letter-spacing="0">Planner builds a DAG. Executor runs it, streaming every step.</text>
+<rect x="44" y="348" width="1192" height="62" rx="10" fill="#fafafa" stroke="#e3e7ec"/>
+<rect x="44" y="348" width="3" height="62" rx="1.5" fill="#eb6834" stroke="none"/>
+<text x="62" y="384.0" fill="#14181d" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="16" font-weight="700" text-anchor="start" letter-spacing="0">Tools</text>
+<text x="244" y="384.0" fill="#5b6675" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="13" font-weight="400" text-anchor="start" letter-spacing="0">12 typed functions: search, fetch, run_model, build_chart, memory.</text>
+<rect x="44" y="424" width="1192" height="62" rx="10" fill="#fafafa" stroke="#e3e7ec"/>
+<rect x="44" y="424" width="3" height="62" rx="1.5" fill="#eda100" stroke="none"/>
+<text x="62" y="460.0" fill="#14181d" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="16" font-weight="700" text-anchor="start" letter-spacing="0">Providers</text>
+<text x="244" y="460.0" fill="#5b6675" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="13" font-weight="400" text-anchor="start" letter-spacing="0">Connectors, forecasting, LLM chain, memory. Each swappable behind a seam.</text>
+</svg>

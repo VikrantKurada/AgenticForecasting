@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 346" width="1280" height="346" role="img" aria-label="Three horizons: what is shipped, what is next, what is a bet">
+<title>Roadmap</title>
+<rect x="0" y="0" width="1280" height="346" rx="0" fill="#ffffff" stroke="none"/>
+<text x="44" y="54" fill="#14181d" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="27" font-weight="700" text-anchor="start" letter-spacing="0">Three horizons</text>
+<text x="44" y="80" fill="#5b6675" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="14" font-weight="400" text-anchor="start" letter-spacing="0">The rule: a later version of this product, not a different product.</text>
+<rect x="44.0" y="128" width="381.3333333333333" height="168" rx="10" fill="#fafafa" stroke="#e3e7ec"/>
+<rect x="44.0" y="128" width="3" height="168" rx="1.5" fill="#1baf7a" stroke="none"/>
+<text x="60.0" y="158" fill="#14181d" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="16" font-weight="700" text-anchor="start" letter-spacing="0">Now</text>
+<text x="409.3333333333333" y="158" fill="#1baf7a" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12" font-weight="700" text-anchor="end" letter-spacing="0">shipped</text>
+<text x="60.0" y="188" fill="#5b6675" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12.5" font-weight="400" text-anchor="start" letter-spacing="0">- Per-question agent DAGs</text>
+<text x="60.0" y="212" fill="#5b6675" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12.5" font-weight="400" text-anchor="start" letter-spacing="0">- 11 live data connectors</text>
+<text x="60.0" y="236" fill="#5b6675" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12.5" font-weight="400" text-anchor="start" letter-spacing="0">- 8 models, 9 chart kinds</text>
+<text x="60.0" y="260" fill="#5b6675" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12.5" font-weight="400" text-anchor="start" letter-spacing="0">- Editable, rerunnable steps</text>
+<path d="M429.3333333333333 212.0 h16 m-6 -4.5 l6 4.5 l-6 4.5" fill="none" stroke="#8d97a5" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="449.3333333333333" y="128" width="381.3333333333333" height="168" rx="10" fill="#fafafa" stroke="#e3e7ec"/>
+<rect x="449.3333333333333" y="128" width="3" height="168" rx="1.5" fill="#eda100" stroke="none"/>
+<text x="465.3333333333333" y="158" fill="#14181d" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="16" font-weight="700" text-anchor="start" letter-spacing="0">Medium</text>
+<text x="814.6666666666666" y="158" fill="#eda100" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12" font-weight="700" text-anchor="end" letter-spacing="0">next</text>
+<text x="465.3333333333333" y="188" fill="#5b6675" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12.5" font-weight="400" text-anchor="start" letter-spacing="0">- More connectors from the</text>
+<text x="465.3333333333333" y="212" fill="#5b6675" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12.5" font-weight="400" text-anchor="start" letter-spacing="0">- 45-source catalog</text>
+<text x="465.3333333333333" y="236" fill="#5b6675" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12.5" font-weight="400" text-anchor="start" letter-spacing="0">- Cross-run comparison</text>
+<text x="465.3333333333333" y="260" fill="#5b6675" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12.5" font-weight="400" text-anchor="start" letter-spacing="0">- Scheduled re-runs</text>
+<path d="M834.6666666666666 212.0 h16 m-6 -4.5 l6 4.5 l-6 4.5" fill="none" stroke="#8d97a5" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="854.6666666666666" y="128" width="381.3333333333333" height="168" rx="10" fill="#fafafa" stroke="#e3e7ec"/>
+<rect x="854.6666666666666" y="128" width="3" height="168" rx="1.5" fill="#4a3aa7" stroke="none"/>
+<text x="870.6666666666666" y="158" fill="#14181d" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="16" font-weight="700" text-anchor="start" letter-spacing="0">Long</text>
+<text x="1220.0" y="158" fill="#4a3aa7" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12" font-weight="700" text-anchor="end" letter-spacing="0">bets</text>
+<text x="870.6666666666666" y="188" fill="#5b6675" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12.5" font-weight="400" text-anchor="start" letter-spacing="0">- A fair-value model layer</text>
+<text x="870.6666666666666" y="212" fill="#5b6675" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12.5" font-weight="400" text-anchor="start" letter-spacing="0">- Scenario analysis</text>
+<text x="870.6666666666666" y="236" fill="#5b6675" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12.5" font-weight="400" text-anchor="start" letter-spacing="0">- Multi-country panels</text>
+<text x="870.6666666666666" y="260" fill="#5b6675" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12.5" font-weight="400" text-anchor="start" letter-spacing="0">- Confidence-scored routing</text>
+</svg>

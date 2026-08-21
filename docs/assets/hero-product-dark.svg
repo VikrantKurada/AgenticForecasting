@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 422" width="1280" height="422" role="img" aria-label="A chat on the left, an output panel of six tabs on the right">
+<title>The product surface</title>
+<rect x="0" y="0" width="1280" height="422" rx="0" fill="#0f1319" stroke="none"/>
+<text x="44" y="54" fill="#e8ecf1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="27" font-weight="700" text-anchor="start" letter-spacing="0">One chat, one output panel</text>
+<text x="44" y="80" fill="#93a0b1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="14" font-weight="400" text-anchor="start" letter-spacing="0">Ask a question in a project chat. The run streams live, then lands in six tabs.</text>
+<rect x="44" y="123" width="3" height="12" rx="1.5" fill="#c98500" stroke="none"/>
+<text x="56" y="132" fill="#93a0b1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12" font-weight="700" text-anchor="start" letter-spacing="1.4">THE OUTPUT PANEL</text>
+<rect x="44.0" y="150" width="384.0" height="96" rx="10" fill="#171c24" stroke="#272e39"/>
+<rect x="44.0" y="150" width="3" height="96" rx="1.5" fill="#3987e5" stroke="none"/>
+<text x="60.0" y="178" fill="#e8ecf1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="15" font-weight="600" text-anchor="start" letter-spacing="0">Charts</text>
+<text x="60.0" y="202" fill="#93a0b1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12" font-weight="400" text-anchor="start" letter-spacing="0">fan, panel, backtest,</text>
+<text x="60.0" y="219" fill="#93a0b1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12" font-weight="400" text-anchor="start" letter-spacing="0">decomposition, heatmap</text>
+<rect x="448.0" y="150" width="384.0" height="96" rx="10" fill="#171c24" stroke="#272e39"/>
+<rect x="448.0" y="150" width="3" height="96" rx="1.5" fill="#d95926" stroke="none"/>
+<text x="464.0" y="178" fill="#e8ecf1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="15" font-weight="600" text-anchor="start" letter-spacing="0">Data</text>
+<text x="464.0" y="202" fill="#93a0b1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12" font-weight="400" text-anchor="start" letter-spacing="0">raw observations,</text>
+<text x="464.0" y="219" fill="#93a0b1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12" font-weight="400" text-anchor="start" letter-spacing="0">saveable as CSV</text>
+<rect x="852.0" y="150" width="384.0" height="96" rx="10" fill="#171c24" stroke="#272e39"/>
+<rect x="852.0" y="150" width="3" height="96" rx="1.5" fill="#199e70" stroke="none"/>
+<text x="868.0" y="178" fill="#e8ecf1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="15" font-weight="600" text-anchor="start" letter-spacing="0">Report</text>
+<text x="868.0" y="202" fill="#93a0b1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12" font-weight="400" text-anchor="start" letter-spacing="0">narrative with figures</text>
+<text x="868.0" y="219" fill="#93a0b1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12" font-weight="400" text-anchor="start" letter-spacing="0">cited inline</text>
+<rect x="44.0" y="266" width="384.0" height="96" rx="10" fill="#171c24" stroke="#272e39"/>
+<rect x="44.0" y="266" width="3" height="96" rx="1.5" fill="#c98500" stroke="none"/>
+<text x="60.0" y="294" fill="#e8ecf1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="15" font-weight="600" text-anchor="start" letter-spacing="0">Method</text>
+<text x="60.0" y="318" fill="#93a0b1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12" font-weight="400" text-anchor="start" letter-spacing="0">the run's real data,</text>
+<text x="60.0" y="335" fill="#93a0b1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12" font-weight="400" text-anchor="start" letter-spacing="0">models, and backtest</text>
+<rect x="448.0" y="266" width="384.0" height="96" rx="10" fill="#171c24" stroke="#272e39"/>
+<rect x="448.0" y="266" width="3" height="96" rx="1.5" fill="#d55181" stroke="none"/>
+<text x="464.0" y="294" fill="#e8ecf1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="15" font-weight="600" text-anchor="start" letter-spacing="0">Steps</text>
+<text x="464.0" y="318" fill="#93a0b1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12" font-weight="400" text-anchor="start" letter-spacing="0">the DAG, editable,</text>
+<text x="464.0" y="335" fill="#93a0b1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12" font-weight="400" text-anchor="start" letter-spacing="0">rerunnable</text>
+<rect x="852.0" y="266" width="384.0" height="96" rx="10" fill="#171c24" stroke="#272e39"/>
+<rect x="852.0" y="266" width="3" height="96" rx="1.5" fill="#008300" stroke="none"/>
+<text x="868.0" y="294" fill="#e8ecf1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="15" font-weight="600" text-anchor="start" letter-spacing="0">Trace</text>
+<text x="868.0" y="318" fill="#93a0b1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12" font-weight="400" text-anchor="start" letter-spacing="0">every tool call</text>
+<text x="868.0" y="335" fill="#93a0b1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12" font-weight="400" text-anchor="start" letter-spacing="0">and argument</text>
+</svg>

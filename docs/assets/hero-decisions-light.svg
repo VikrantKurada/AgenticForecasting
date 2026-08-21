@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 338" width="1280" height="338" role="img" aria-label="Three ways the model could touch numbers; the third was chosen">
+<title>The central decision</title>
+<rect x="0" y="0" width="1280" height="338" rx="0" fill="#ffffff" stroke="none"/>
+<text x="44" y="54" fill="#14181d" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="27" font-weight="700" text-anchor="start" letter-spacing="0">How does the model touch numbers?</text>
+<text x="44" y="80" fill="#5b6675" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="14" font-weight="400" text-anchor="start" letter-spacing="0">The decision the whole system turns on. The model selects; it never computes.</text>
+<rect x="44.0" y="128" width="381.3333333333333" height="150" rx="10" fill="#fafafa" stroke="#e3e7ec"/>
+<rect x="44.0" y="128" width="3" height="150" rx="1.5" fill="#e34948" stroke="none"/>
+<text x="60.0" y="158" fill="#e34948" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="17" font-weight="800" text-anchor="start" letter-spacing="0">A</text>
+<text x="88.0" y="158" fill="#14181d" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="14.5" font-weight="600" text-anchor="start" letter-spacing="0">The model writes the numbers</text>
+<text x="60.0" y="186.0" fill="#5b6675" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12" font-weight="400" text-anchor="start" letter-spacing="0">Ask an LLM for a beta; it</text>
+<text x="60.0" y="201.5" fill="#5b6675" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12" font-weight="400" text-anchor="start" letter-spacing="0">returns a plausible figure</text>
+<text x="60.0" y="217.0" fill="#5b6675" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12" font-weight="400" text-anchor="start" letter-spacing="0">without touching data.</text>
+<text x="60.0" y="232.5" fill="#5b6675" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12" font-weight="400" text-anchor="start" letter-spacing="0"></text>
+<text x="60.0" y="248.0" fill="#5b6675" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12" font-weight="400" text-anchor="start" letter-spacing="0">Rejected: it invents</text>
+<text x="60.0" y="263.5" fill="#5b6675" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12" font-weight="400" text-anchor="start" letter-spacing="0">statistics.</text>
+<rect x="449.3333333333333" y="128" width="381.3333333333333" height="150" rx="10" fill="#fafafa" stroke="#e3e7ec"/>
+<rect x="449.3333333333333" y="128" width="3" height="150" rx="1.5" fill="#eda100" stroke="none"/>
+<text x="465.3333333333333" y="158" fill="#eda100" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="17" font-weight="800" text-anchor="start" letter-spacing="0">B</text>
+<text x="493.3333333333333" y="158" fill="#14181d" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="14.5" font-weight="600" text-anchor="start" letter-spacing="0">Native tool-use APIs</text>
+<text x="465.3333333333333" y="186.0" fill="#5b6675" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12" font-weight="400" text-anchor="start" letter-spacing="0">Let each provider's own</text>
+<text x="465.3333333333333" y="201.5" fill="#5b6675" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12" font-weight="400" text-anchor="start" letter-spacing="0">function-calling drive the</text>
+<text x="465.3333333333333" y="217.0" fill="#5b6675" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12" font-weight="400" text-anchor="start" letter-spacing="0">loop.</text>
+<text x="465.3333333333333" y="232.5" fill="#5b6675" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12" font-weight="400" text-anchor="start" letter-spacing="0"></text>
+<text x="465.3333333333333" y="248.0" fill="#5b6675" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12" font-weight="400" text-anchor="start" letter-spacing="0">Rejected: five providers,</text>
+<text x="465.3333333333333" y="263.5" fill="#5b6675" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12" font-weight="400" text-anchor="start" letter-spacing="0">five behaviours.</text>
+<rect x="854.6666666666666" y="128" width="381.3333333333333" height="150" rx="10" fill="#fafafa" stroke="#1baf7a"/>
+<rect x="854.6666666666666" y="128" width="3" height="150" rx="1.5" fill="#1baf7a" stroke="none"/>
+<text x="870.6666666666666" y="158" fill="#1baf7a" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="17" font-weight="800" text-anchor="start" letter-spacing="0">C</text>
+<text x="898.6666666666666" y="158" fill="#14181d" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="14.5" font-weight="600" text-anchor="start" letter-spacing="0">JSON text protocol + typed tools</text>
+<text x="1220.0" y="158" fill="#1baf7a" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12" font-weight="700" text-anchor="end" letter-spacing="0">chosen</text>
+<text x="870.6666666666666" y="186.0" fill="#5b6675" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12" font-weight="400" text-anchor="start" letter-spacing="0">The model emits one JSON</text>
+<text x="870.6666666666666" y="201.5" fill="#5b6675" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12" font-weight="400" text-anchor="start" letter-spacing="0">action. A typed function</text>
+<text x="870.6666666666666" y="217.0" fill="#5b6675" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12" font-weight="400" text-anchor="start" letter-spacing="0">does the arithmetic.</text>
+<text x="870.6666666666666" y="232.5" fill="#5b6675" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12" font-weight="400" text-anchor="start" letter-spacing="0"></text>
+<text x="870.6666666666666" y="248.0" fill="#5b6675" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12" font-weight="400" text-anchor="start" letter-spacing="0">Chosen: every provider</text>
+<text x="870.6666666666666" y="263.5" fill="#5b6675" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12" font-weight="400" text-anchor="start" letter-spacing="0">behaves identically.</text>
+</svg>

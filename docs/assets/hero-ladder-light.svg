@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 512" width="1280" height="512" role="img" aria-label="A ladder where each rung is reachable only because of the one below">
+<title>The art of the possible</title>
+<rect x="0" y="0" width="1280" height="512" rx="0" fill="#ffffff" stroke="none"/>
+<text x="44" y="54" fill="#14181d" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="27" font-weight="700" text-anchor="start" letter-spacing="0">Each rung stands on the one below</text>
+<text x="44" y="80" fill="#5b6675" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="14" font-weight="400" text-anchor="start" letter-spacing="0">Every claim names what makes it possible, and the answer already exists.</text>
+<rect x="44" y="404" width="1192" height="60" rx="10" fill="#fafafa" stroke="#e3e7ec"/>
+<rect x="44" y="404" width="3" height="60" rx="1.5" fill="#2a78d6" stroke="none"/>
+<text x="60" y="429" fill="#14181d" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="14.5" font-weight="600" text-anchor="start" letter-spacing="0">Typed tools that compute</text>
+<text x="60" y="449" fill="#5b6675" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12" font-weight="400" text-anchor="start" letter-spacing="0">The floor. A function, not a token, does the arithmetic.</text>
+<rect x="84" y="332" width="1152" height="60" rx="10" fill="#fafafa" stroke="#e3e7ec"/>
+<rect x="84" y="332" width="3" height="60" rx="1.5" fill="#eb6834" stroke="none"/>
+<text x="100" y="357" fill="#14181d" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="14.5" font-weight="600" text-anchor="start" letter-spacing="0">Errors that teach</text>
+<text x="100" y="377" fill="#5b6675" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12" font-weight="400" text-anchor="start" letter-spacing="0">A failed call names the valid options, so the agent recovers.</text>
+<rect x="124" y="260" width="1112" height="60" rx="10" fill="#fafafa" stroke="#e3e7ec"/>
+<rect x="124" y="260" width="3" height="60" rx="1.5" fill="#1baf7a" stroke="none"/>
+<text x="140" y="285" fill="#14181d" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="14.5" font-weight="600" text-anchor="start" letter-spacing="0">Live run state in every prompt</text>
+<text x="140" y="305" fill="#5b6675" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12" font-weight="400" text-anchor="start" letter-spacing="0">No agent has to guess what a prior step produced.</text>
+<rect x="164" y="188" width="1072" height="60" rx="10" fill="#fafafa" stroke="#e3e7ec"/>
+<rect x="164" y="188" width="3" height="60" rx="1.5" fill="#eda100" stroke="none"/>
+<text x="180" y="213" fill="#14181d" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="14.5" font-weight="600" text-anchor="start" letter-spacing="0">A replayable, editable DAG</text>
+<text x="180" y="233" fill="#5b6675" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12" font-weight="400" text-anchor="start" letter-spacing="0">The workflow is data, so a person can rerun or change it.</text>
+<rect x="204" y="116" width="1032" height="60" rx="10" fill="#fafafa" stroke="#e3e7ec"/>
+<rect x="204" y="116" width="3" height="60" rx="1.5" fill="#e87ba4" stroke="none"/>
+<text x="220" y="141" fill="#14181d" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="14.5" font-weight="600" text-anchor="start" letter-spacing="0">Scenarios and fair-value models</text>
+<text x="220" y="161" fill="#5b6675" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12" font-weight="400" text-anchor="start" letter-spacing="0">Because the tool layer is typed, new tools slot in.</text>
+</svg>

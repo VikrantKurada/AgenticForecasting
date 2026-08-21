@@ -1,162 +1,234 @@
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/hero-readme-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="docs/assets/hero-readme-light.svg">
+  <img alt="A question flows through a planned team of agents into an output panel of charts, data, report, method, steps, and trace" src="docs/assets/hero-readme-light.svg">
+</picture>
+
 # Agentic Forecasting
 
-A local, chat-driven macroeconomic forecasting platform. Ask a forecasting question in a
-project chat — a dynamically planned team of agents picks the data, pulls it from official
-sources, runs econometric models, renders charts, and explains its methodology. Every
-decision is traceable, and every token is accounted for.
+A local, chat-driven macroeconomic forecasting platform. Ask a forecasting
+question in a project chat. A planner composes a team of agents that pick the
+data, pull it from official sources, run econometric models, render charts, and
+explain the method. Every number comes from a tool, and every step is a
+recorded event.
 
-## What it does
+## The problem
 
-- **Forecasting use-cases:** GDP/inflation nowcasting, sovereign default risk, yield-curve
-  trajectories, geopolitical & supply-chain spillovers — all through one agentic pipeline.
-- **Dynamic agent workflows:** a planner LLM composes a run-specific DAG from specialist
-  roles (data scout, fetcher, modeler, validator, chart builder, explainer); an executor
-  streams every step live to the UI.
-- **Real data:** working connectors for FRED, World Bank, IMF, BLS, ECB, OECD, DBnomics
-  (80+ providers incl. BoE, Bundesbank, Eurostat), US Treasury Fiscal Data, EIA (world
-  energy production/consumption), FAOSTAT (global agricultural commodities), and Alpha
-  Vantage (equities/FX/crypto) — with retries and a 24 h SQLite cache. A 40+ source
-  catalog (Polygon, Finnhub, FMP, Tiingo, Alpaca, Companies House, …) accepts API keys
-  in Settings → Data sources now and activates as connectors ship.
-- **Econometrics & ML:** auto-order ARIMA/SARIMAX, ETS, Theta, VAR, bridge/dynamic-factor
-  nowcasting, gradient boosting on lag features, Monte Carlo bootstrap fans, model
-  ensembles, Nelson-Siegel yield curves, gradient-boosted credit risk — always backtested
-  against a naive baseline so the explanation is honest.
-- **Charts:** fan charts with confidence bands, model-comparison overlays, trend/seasonal
-  decompositions, change distributions, correlation heatmaps, indicator panels, backtest
-  comparisons, yield curves, and data tables in a resizable Fragments-style output panel
-  (Charts / Data / Report / Method / Steps / Trace tabs). Every chart and table is
-  numbered as a Figure; the report cites those figures and renders them inline.
-- **Orchestrator you can replay:** the Steps tab shows the run's workflow DAG — each
-  agent step, what it depends on, the tools it called, and its output — and lets you
-  edit any step's instructions and rerun the whole workflow without re-planning.
-- **Per-run methodology:** a dedicated Methodology tab documents the workflow DAG, data
-  provenance, every model's parameters and fit statistics, how uncertainty bands were
-  derived, and the backtest verdict — generated from what the run actually did.
-- **Chats & exports:** chats auto-name from the first question; projects and chats can be
-  renamed inline in the sidebar (double-click or the pencil button); per-run
-  data source and horizon preferences; one-click export of a chat or a whole project
-  (transcript, reports, methodology, charts as HTML, data as CSV, trace JSON) into a
-  folder on your Desktop.
-- **Memory (5 types):** short-term chat context, episodic run history, semantic facts with
-  retrieval, procedural workflow templates, all persisted long-term in SQLite — pluggable
-  backends with Mem0 and Zep adapters plus connect stubs for Letta, Supermemory, Cognee,
-  Hindsight, RetainDB, EverOS, Maximem Synap, and Supabase.
-- **LLM providers:** Claude (Anthropic), OpenAI, Gemini, NVIDIA NIM, and local Ollama with
-  ordered fallback — plus a deterministic demo mode when nothing is configured.
-- **Telemetry:** every user action and agent decision is an event with trace/span ids; a
-  per-project dashboard tracks tokens, estimated cost, CPU/RAM/GPU during runs.
+Ask a good language model for the beta of Apple against the S&P 500. It will
+give you a number. It will be formatted like a beta, it will be in a plausible
+range, and it will be delivered in the same tone as a correct answer. Sometimes
+it will even be right.
 
-## Setup
+That is the problem. A forecast you cannot trace is a guess with a confidence
+interval drawn on afterward. This project has watched its own agents fail in
+exactly this shape. A real run in its history was asked how the GBP/INR
+exchange rate had changed over twenty years and replied, in full prose, that it
+could not draw charts and here was some Python to run yourself. No data was
+fetched. No chart was drawn. The answer read as authoritative and was empty.
 
-Backend (Python 3.12+):
+The failures cluster into three kinds, and each has a different remedy. A model
+that invents a statistic. A model that cannot see what a prior step produced, so
+it guesses. A data source that returns plausible filler instead of admitting no
+match. [docs/1-why](docs/1-why/) lays out all three with the trace output behind
+each.
+
+## The answer
+
+The model selects; it never computes. A planner language model turns a question
+into a workflow DAG of specialist agents. Each agent is a language model with a
+restricted toolbelt, and it acts only by naming a tool and its arguments in
+JSON. A typed Python function does the arithmetic, fetches the series, or fits
+the model. The prose an agent writes is checked against what the tools actually
+returned.
+
+This is why the whole system turns on one decision: tool calls are a JSON text
+protocol, not a provider's native function-calling API. Five providers behave
+identically, and a deterministic demo provider can stand in when none is
+reachable and still produce a real forecast. The cost is that the protocol is
+looser than a typed API, so a node can emit a malformed action; the parser is
+built to tolerate that, and a repeated identical failure aborts the node.
+[docs/4-decisions](docs/4-decisions/) records the trade in full.
+
+```mermaid
+flowchart LR
+    Q["Question<br/>(chat message)"] --> P["Planner<br/>LLM builds a DAG"]
+    P --> S["scout"]
+    S --> F["fetch"]
+    F --> M["model"]
+    M --> V["validate"]
+    M --> C["charts"]
+    V --> E["explain"]
+    C --> E
+    E --> O["Output panel<br/>charts, data, report,<br/>method, steps, trace"]
+    style Q fill:#2a78d6,stroke:#2a78d6,color:#fff
+    style O fill:#1baf7a,stroke:#1baf7a,color:#fff
+```
+
+## Documentation
+
+| # | Section | For | Answers |
+|---|---|---|---|
+| 1 | [Why](docs/1-why/) | Anyone deciding whether to look | What goes wrong, and why a product rather than a prompt |
+| 2 | [Product](docs/2-product/) | Product owners, new users | What it does, what it guarantees, what it refuses |
+| 3 | [Architecture](docs/3-architecture/) | Engineers | The layers, the seams, and the hard-won constraints |
+| 4 | [Decisions](docs/4-decisions/) | Engineers, reviewers | Why it is built this way, and what would reverse each choice |
+| 5 | [Roadmap](docs/5-roadmap/) | Contributors, planners | What ships next, and what is a bet |
+| 6 | [Art of the possible](docs/6-art-of-the-possible/) | The curious | What the pattern makes reachable |
+
+Start at [docs/](docs/) for the three-paragraph version and the sources of
+truth.
+
+## Status
+
+Version 0.1.0. Runs locally, offline-capable. The test suite is 197 backend
+tests (all offline) and 7 frontend store tests. Backend is 6,278 lines of
+Python, frontend is 3,060 lines of TypeScript. The counts in this file come
+from commands you can re-run; see [docs/2-product/capabilities.md](docs/2-product/capabilities.md).
+
+<details>
+<summary><strong>What works today</strong></summary>
+
+- **Dynamic agent workflows.** A planner LLM composes a run-specific DAG from
+  six specialist roles (data scout, fetcher, modeler, validator, chart builder,
+  explainer). An executor runs it and streams every step to the UI over SSE.
+- **Real data.** 11 wired connectors: FRED, World Bank, IMF, BLS, ECB, OECD,
+  DBnomics (80+ upstream providers), US Treasury Fiscal Data, EIA, FAOSTAT,
+  Alpha Vantage. A 45-source catalog in 7 categories accepts API keys in
+  Settings and activates connectors as they ship. Responses cache in SQLite for
+  24 hours, with retries.
+- **Econometrics and ML.** 8 models: auto-order ARIMA, ETS, Theta, gradient
+  boosting, Monte Carlo bootstrap, an ensemble, VAR, and bridge nowcasting.
+  Each is backtested against a naive baseline so the explanation is honest.
+- **Charts.** 9 kinds: fan charts with confidence bands, model-comparison
+  overlays, trend/seasonal decompositions, change distributions, correlation
+  heatmaps, indicator panels, backtest comparisons, Nelson-Siegel yield curves,
+  and data tables.
+- **The output panel.** Six tabs: Charts, Data, Report, Method, Steps, Trace.
+  Charts and tables are numbered as figures, the report cites them inline, and
+  the Steps tab shows the DAG with editable, rerunnable instructions.
+- **Memory.** 4 types (short-term chat context, episodic run history, semantic
+  facts with retrieval, procedural workflow templates), persisted long-term in
+  SQLite. Pluggable backends with Mem0 and Zep adapters, plus connect stubs for
+  8 more services.
+- **LLM providers.** Anthropic, OpenAI, Gemini, NVIDIA NIM, and local Ollama,
+  in an ordered fallback chain, with a deterministic demo mode when nothing is
+  configured.
+- **Telemetry.** Every action and decision is an event with trace and span ids.
+  A per-project dashboard tracks tokens, estimated cost, and CPU/RAM/GPU during
+  runs.
+
+</details>
+
+<details>
+<summary><strong>What it will not do</strong></summary>
+
+- **Let a model write a number that no tool computed.** The report's figures
+  come from the tool results. This is the point of the whole design.
+- **Run a chart the data cannot support without saying why.** A chart builder
+  call for a series that was never fetched fails with the list of series that
+  do exist, and the failure is the useful signal.
+- **Invent a data match.** A search that finds nothing returns nothing, not the
+  head of a catalog. See [docs/1-why/what-goes-wrong.md](docs/1-why/what-goes-wrong.md).
+- **Forecast when you asked what already happened.** A retrospective question
+  gets a describe-and-chart workflow with no modeling step.
+- **Give financial advice.** Forecasts are statistical estimates with stated
+  uncertainty. Nothing here is investment advice.
+- **Call a provider's native tool-use API.** Tools are a JSON text protocol so
+  every provider behaves identically. See [docs/4-decisions](docs/4-decisions/).
+
+</details>
+
+## Quickstart
+
+Prerequisites: Python 3.12+, Node 20+. No API keys are required; with none, the
+app tries local Ollama and then a deterministic demo workflow that produces a
+real ARIMA forecast from World Bank data.
+
+Backend:
 
 ```powershell
 cd backend
 python -m venv .venv
-.venv\Scripts\python -m pip install fastapi "uvicorn[standard]" sqlalchemy pydantic pydantic-settings httpx httpx2 pandas numpy statsmodels scikit-learn anthropic openai google-genai ddgs psutil nvidia-ml-py python-dotenv pytest sse-starlette mcp
-copy .env.example .env   # then add the keys you have
+.venv\Scripts\python -m pip install fastapi "uvicorn[standard]" sqlalchemy pydantic pydantic-settings httpx pandas numpy statsmodels scikit-learn anthropic openai google-genai ddgs psutil nvidia-ml-py python-dotenv pytest sse-starlette mcp
+copy .env.example .env
 ```
 
-Frontend (Node 20+):
+Frontend:
 
 ```powershell
 cd frontend
 npm install
 ```
 
-### Keys (all optional)
-
-Data-source API keys can be entered directly in **Settings → Data sources** (stored in
-the local SQLite DB, masked in the UI). `backend/.env` still works as a fallback for the
-keys below and for LLM providers:
-
-| Key | Enables |
-| --- | --- |
-| `ANTHROPIC_API_KEY` | Claude models (recommended orchestrator) |
-| `OPENAI_API_KEY` | OpenAI models |
-| `GEMINI_API_KEY` | Gemini models |
-| `NVIDIA_API_KEY` | NVIDIA NIM endpoints |
-| `OLLAMA_BASE_URL` | Local Ollama (default `http://localhost:11434/v1`) |
-| `FRED_API_KEY` | FRED data (free: fred.stlouisfed.org) |
-| `BLS_API_KEY` | Higher BLS rate limits (optional) |
-| `MEM0_API_KEY`, `ZEP_API_KEY` | Cloud memory backends |
-
-With no keys at all the app still works: Ollama is tried first, then a deterministic demo
-workflow produces a real ARIMA forecast from World Bank data, clearly labeled as demo mode.
-
-## Run
+Run both:
 
 ```powershell
 scripts\dev.ps1
 ```
 
-or manually in two terminals:
+Open http://localhost:5173, create a project, open a chat, and ask something
+like "Nowcast US GDP growth for the current quarter" or "How has UK
+unemployment changed over the last 20 years".
 
-```powershell
-cd backend; .venv\Scripts\python -m uvicorn app.main:create_app --factory --port 8000
-cd frontend; npm run dev
-```
-
-Open http://localhost:5173 — create a project in the sidebar, open a chat, and ask e.g.
-*“Nowcast US GDP growth for the current quarter.”*
+Keys are optional and go in **Settings, Data sources** (stored in SQLite,
+masked) or in `backend/.env`. The full table is in
+[docs/2-product/README.md](docs/2-product/README.md).
 
 ## Tests
 
 ```powershell
-cd backend; .venv\Scripts\python -m pytest      # 162 tests, all offline
-cd frontend; npx vitest run                      # store tests
+cd backend; .venv\Scripts\python -m pytest      # 197 tests, all offline
+cd frontend; npx vitest run                      # 7 store tests
 ```
 
-## Architecture
+## Layout
 
 ```
-frontend/  React + Vite + TS + Tailwind + Plotly
-  src/components/Sidebar        collapsible projects/chats
-  src/components/Chat           streaming chat + live workflow progress (SSE)
-  src/components/OutputPanel    Charts / Data / Report / Method / Steps / Trace + save dialog
-  src/pages                     Usage dashboard, Settings
-
+frontend/  React + Vite + TypeScript + Tailwind + Plotly
 backend/   FastAPI + SQLAlchemy (SQLite) + SSE
-  app/agents/engine   planner (LLM→DAG, template fallback), executor, event bus, sampler
-  app/agents/tools    search/fetch series, run_model, charts, web search, http, MCP, memory
-  app/connectors      FRED, World Bank, IMF, BLS, ECB, OECD (+ cache, retries, stubs)
-  app/forecasting     ARIMA/ETS/VAR, nowcast, Nelson-Siegel, credit, backtesting
-  app/llm             Anthropic / OpenAI-compatible / Gemini adapters, fallback registry
-  app/memory          5-type memory, SQLite backend, Mem0/Zep adapters, catalog
-  app/routers         projects, chats, chat pipeline, telemetry, settings, file export
+  app/agents/engine   planner, executor, event bus, resource sampler
+  app/agents/tools    the 12 agent tools
+  app/connectors      11 data-source connectors, cache, catalog
+  app/forecasting     the 8 models, backtesting, series helpers
+  app/llm             provider adapters and the fallback registry
+  app/memory          4-type memory, SQLite backend, Mem0/Zep adapters
+  app/routers         projects, chats, chat pipeline, telemetry, settings, files
+docs/      the six documentation sections and the diagram generators
 ```
 
-Design and plan documents live in `docs/plans/`.
+## Contributing
+
+There is no formal process yet. The architecture that a change has to respect
+is in [docs/3-architecture](docs/3-architecture/), and the decisions it should
+not silently undo are in [docs/4-decisions](docs/4-decisions/). Both test
+suites must pass.
+
+## Licence
+
+No licence file is present. Treat the code as all-rights-reserved until one is
+added.
 
 ## Acknowledgements
 
-This project stands on generously provided public data and open-source software.
+This project stands on generously provided public data and open-source
+software. All data is fetched live from providers' public APIs and remains
+subject to their terms of use.
 
-**Data providers** — all data is fetched live from the providers' public APIs and
-remains subject to their respective terms of use:
+**Data providers.** Federal Reserve Bank of St. Louis (this product uses the
+FRED API but is not endorsed or certified by the Bank), The World Bank
+(Indicators API, CC BY 4.0), International Monetary Fund, OECD, European Central
+Bank, U.S. Bureau of Labor Statistics, U.S. Department of the Treasury (Fiscal
+Data), U.S. Energy Information Administration, FAO (FAOSTAT, CC BY 4.0),
+DBnomics (Cepremap), and Alpha Vantage.
 
-- Federal Reserve Bank of St. Louis — this product uses the FRED® API but is not
-  endorsed or certified by the Federal Reserve Bank of St. Louis
-- The World Bank (Indicators API, CC BY 4.0) · International Monetary Fund (IMF Data
-  Services) · OECD (SDMX API) · European Central Bank (Data Portal) · U.S. Bureau of
-  Labor Statistics · U.S. Department of the Treasury (Fiscal Data) · U.S. Energy
-  Information Administration · FAO (FAOSTAT, CC BY 4.0)
-- DBnomics (Cepremap) — open aggregation of 80+ statistical providers
-- Alpha Vantage — market data API
-
-**Open-source software:** FastAPI, Starlette, SQLAlchemy, pydantic, pandas, NumPy,
-statsmodels, scikit-learn, httpx, sse-starlette, openpyxl, psutil, ddgs, the Model
+**Open-source software.** FastAPI, Starlette, SQLAlchemy, pydantic, pandas,
+NumPy, statsmodels, scikit-learn, httpx, sse-starlette, psutil, ddgs, the Model
 Context Protocol SDK; React, Vite, TypeScript, Tailwind CSS, Plotly.js,
-react-plotly.js, Zustand, react-markdown — thank you to all maintainers and
-contributors.
+react-plotly.js, Zustand, react-markdown.
 
-**LLM providers & SDKs:** Anthropic (Claude), OpenAI, Google (Gemini), NVIDIA
+**LLM providers and SDKs.** Anthropic (Claude), OpenAI, Google (Gemini), NVIDIA
 (NIM), and Ollama.
 
-Built with [Claude Code](https://claude.com/claude-code) using Claude Fable 5 by
-Anthropic.
-
-**Disclaimer:** this software is for research and educational purposes. Forecasts
-are statistical estimates with uncertainty — nothing produced by this application
-is financial or investment advice.
+**Disclaimer.** This software is for research and educational purposes.
+Forecasts are statistical estimates with uncertainty. Nothing produced by this
+application is financial or investment advice.

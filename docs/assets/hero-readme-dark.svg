@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 400" width="1280" height="400" role="img" aria-label="A question flows through a planned team of agents into an output panel">
+<title>Agentic Forecasting</title>
+<rect x="0" y="0" width="1280" height="400" rx="0" fill="#0f1319" stroke="none"/>
+<text x="44" y="54" fill="#e8ecf1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="27" font-weight="700" text-anchor="start" letter-spacing="0">Agentic Forecasting</text>
+<text x="44" y="80" fill="#93a0b1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="14" font-weight="400" text-anchor="start" letter-spacing="0">A local, chat-driven macroeconomic forecasting platform. Models choose; typed tools compute.</text>
+<rect x="44.0" y="132" width="214.4" height="118" rx="10" fill="#171c24" stroke="#272e39"/>
+<rect x="44.0" y="132" width="3" height="118" rx="1.5" fill="#3987e5" stroke="none"/>
+<text x="59.0" y="160" fill="#e8ecf1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="15" font-weight="600" text-anchor="start" letter-spacing="0">Question</text>
+<text x="59.0" y="184" fill="#93a0b1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="11.5" font-weight="400" text-anchor="start" letter-spacing="0">a chat message</text>
+<path d="M264.4 191.0 h18 m-6 -4.5 l6 4.5 l-6 4.5" fill="none" stroke="#6f7c8d" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="288.4" y="132" width="214.4" height="118" rx="10" fill="#171c24" stroke="#272e39"/>
+<rect x="288.4" y="132" width="3" height="118" rx="1.5" fill="#9085e9" stroke="none"/>
+<text x="303.4" y="160" fill="#e8ecf1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="15" font-weight="600" text-anchor="start" letter-spacing="0">Planner</text>
+<text x="303.4" y="184" fill="#93a0b1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="11.5" font-weight="400" text-anchor="start" letter-spacing="0">LLM composes a DAG</text>
+<path d="M508.79999999999995 191.0 h18 m-6 -4.5 l6 4.5 l-6 4.5" fill="none" stroke="#6f7c8d" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="532.8" y="132" width="214.4" height="118" rx="10" fill="#171c24" stroke="#272e39"/>
+<rect x="532.8" y="132" width="3" height="118" rx="1.5" fill="#199e70" stroke="none"/>
+<text x="547.8" y="160" fill="#e8ecf1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="15" font-weight="600" text-anchor="start" letter-spacing="0">Agents</text>
+<text x="547.8" y="184" fill="#93a0b1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="11.5" font-weight="400" text-anchor="start" letter-spacing="0">scout, fetch, model,</text>
+<text x="547.8" y="200" fill="#93a0b1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="11.5" font-weight="400" text-anchor="start" letter-spacing="0">validate, chart, explain</text>
+<path d="M753.1999999999999 191.0 h18 m-6 -4.5 l6 4.5 l-6 4.5" fill="none" stroke="#6f7c8d" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="777.2" y="132" width="214.4" height="118" rx="10" fill="#171c24" stroke="#272e39"/>
+<rect x="777.2" y="132" width="3" height="118" rx="1.5" fill="#d95926" stroke="none"/>
+<text x="792.2" y="160" fill="#e8ecf1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="15" font-weight="600" text-anchor="start" letter-spacing="0">Tools</text>
+<text x="792.2" y="184" fill="#93a0b1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="11.5" font-weight="400" text-anchor="start" letter-spacing="0">12 typed functions</text>
+<text x="792.2" y="200" fill="#93a0b1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="11.5" font-weight="400" text-anchor="start" letter-spacing="0">do the real work</text>
+<path d="M997.6 191.0 h18 m-6 -4.5 l6 4.5 l-6 4.5" fill="none" stroke="#6f7c8d" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="1021.6" y="132" width="214.4" height="118" rx="10" fill="#171c24" stroke="#272e39"/>
+<rect x="1021.6" y="132" width="3" height="118" rx="1.5" fill="#c98500" stroke="none"/>
+<text x="1036.6" y="160" fill="#e8ecf1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="15" font-weight="600" text-anchor="start" letter-spacing="0">Output panel</text>
+<text x="1036.6" y="184" fill="#93a0b1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="11.5" font-weight="400" text-anchor="start" letter-spacing="0">charts, data, report,</text>
+<text x="1036.6" y="200" fill="#93a0b1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="11.5" font-weight="400" text-anchor="start" letter-spacing="0">method, steps, trace</text>
+<rect x="44" y="293" width="3" height="12" rx="1.5" fill="#e66767" stroke="none"/>
+<text x="56" y="302" fill="#93a0b1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="12" font-weight="700" text-anchor="start" letter-spacing="1.4">EVERY STEP IS A TRACE EVENT</text>
+<text x="44" y="328" fill="#93a0b1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="13" font-weight="400" text-anchor="start" letter-spacing="0">The planner builds the workflow per question. Each agent is a language model with a restricted toolbelt, choosing its own actions and self-correcting</text>
+<text x="44" y="348" fill="#93a0b1" font-family="ui-sans-serif,-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="13" font-weight="400" text-anchor="start" letter-spacing="0">from tool errors. When no provider is reachable, a deterministic demo run still produces a real forecast.</text>
+</svg>
